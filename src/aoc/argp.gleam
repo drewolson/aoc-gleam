@@ -39,10 +39,10 @@ pub fn flag(command: Command(fn(Bool) -> b), flag: Flag) -> Command(b) {
   apply(command, Command(info: flag.to_arg_info(flag), f: flag.run(flag, _)))
 }
 
-pub fn rest(command: Command(fn(List(String)) -> b)) -> Command(b) {
+pub fn rest(command: Command(fn(List(String)) -> b), name: String) -> Command(b) {
   apply(
     command,
-    Command(info: ArgInfo(..arg_info.empty(), rest: True), f: fn(args) {
+    Command(info: ArgInfo(..arg_info.empty(), rest: Some(name)), f: fn(args) {
       Ok(#(args, []))
     }),
   )

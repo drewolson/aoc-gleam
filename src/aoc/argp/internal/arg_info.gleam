@@ -25,7 +25,7 @@ pub type ArgInfo {
     named: List(NamedInfo),
     positional: List(PositionalInfo),
     flags: List(FlagInfo),
-    rest: Bool,
+    rest: Option(String),
   )
 }
 
@@ -53,8 +53,16 @@ fn flag_str(f_info: FlagInfo) -> String {
   "[" <> { string.join(names_list, ",") } <> "]"
 }
 
+fn pos_str(p_info: PositionalInfo) -> String {
+  let #(start, end) = case p_info.default {
+    Some(_) -> #("[", "]")
+    None -> #("(", ")")
+  }
+  start <> string.uppercase(p_info.name) <> end
+}
+
 pub fn empty() -> ArgInfo {
-  ArgInfo(named: [], positional: [], flags: [], rest: False)
+  ArgInfo(named: [], positional: [], flags: [], rest: None)
 }
 
 pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
@@ -62,7 +70,7 @@ pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
     named: list.append(a.named, b.named),
     positional: list.append(a.positional, b.positional),
     flags: list.append(a.flags, b.flags),
-    rest: a.rest || b.rest,
+    rest: option.or(a.rest, b.rest),
   )
 }
 
@@ -75,18 +83,20 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
     info.flags
     |> list.map(flag_str)
 
+  let pos_args =
+    info.positional
+    |> list.map(pos_str)
+
   let max_size =
     named_args
     |> list.append(flag_args)
+    |> list.append(pos_args)
     |> list.map(string.length)
     |> list.fold(0, int.max)
 
-  let positional_args =
-    list.map(info.positional, fn(p_info) { string.uppercase(p_info.name) })
-
   let rest_args = case info.rest {
-    True -> ["[..REST]"]
-    False -> []
+    Some(name) -> ["[..." <> string.uppercase(name) <> "]"]
+    None -> []
   }
 
   let usage =
@@ -94,10 +104,30 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
       [name]
         |> list.append(named_args)
         |> list.append(flag_args)
-        |> list.append(positional_args)
+        |> list.append(pos_args)
         |> list.append(rest_args),
       " ",
     )
+
+  let pos_desc =
+    info.positional
+    |> list.map(fn(p_info) {
+      let name =
+        p_info
+        |> pos_str
+        |> string.pad_right(max_size, " ")
+
+      case p_info.default {
+        None -> name <> "\t" <> p_info.help |> option.unwrap("")
+        Some(v) ->
+          name
+          <> "\t"
+          <> p_info.help
+          |> option.map(fn(h) { h <> " (default: " <> v <> ")" })
+          |> option.unwrap("default: " <> v)
+      }
+    })
+    |> string.join("\n")
 
   let named_desc =
     info.named
@@ -114,7 +144,7 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
           <> "\t"
           <> n_info.help
           |> option.map(fn(h) { h <> " (default: " <> v <> ")" })
-          |> option.unwrap("")
+          |> option.unwrap("default: " <> v)
       }
     })
     |> string.join("\n")
@@ -133,13 +163,20 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
 
   let opt_desc = string.join([named_desc, flag_desc], "\n")
 
+  let pos_lines = case string.is_empty(pos_desc) {
+    True -> []
+    False -> ["Arguments:", pos_desc]
+  }
+
+  let opt_lines = case string.is_empty(opt_desc) {
+    True -> []
+    False -> ["Available options:", opt_desc]
+  }
+
   string.join(
-    [
-      name <> " -- " <> description,
-      "Usage: " <> usage,
-      "Available options:",
-      opt_desc,
-    ],
+    [name <> " -- " <> description, "Usage: " <> usage]
+      |> list.append(pos_lines)
+      |> list.append(opt_lines),
     "\n\n",
   )
 }
