@@ -89,7 +89,7 @@ pub fn float(arg: Arg(String)) -> Arg(Float) {
   })
 }
 
-pub fn next(name: String) -> Arg(String) {
+pub fn named(name: String) -> Arg(String) {
   Arg(name:, default: None, help: None, try_map: Ok)
 }
 
