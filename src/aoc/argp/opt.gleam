@@ -11,14 +11,14 @@ pub opaque type Opt(a) {
     name: String,
     default: Option(a),
     help: Option(String),
-    constraint: fn(String) -> Result(a, String),
+    try_map: fn(String) -> Result(a, String),
     short: Option(String),
   )
 }
 
 pub fn to_arg_info(opt: Opt(a)) -> ArgInfo {
   case opt {
-    Opt(name:, short:, default:, help:, constraint: _) ->
+    Opt(name:, short:, default:, help:, try_map: _) ->
       ArgInfo(
         ..arg_info.empty(),
         named: [
@@ -33,44 +33,44 @@ pub fn to_arg_info(opt: Opt(a)) -> ArgInfo {
   }
 }
 
-pub fn constrain(opt: Opt(a), f: fn(a) -> Result(b, String)) -> Opt(b) {
+pub fn try_map(opt: Opt(a), f: fn(a) -> Result(b, String)) -> Opt(b) {
   case opt {
-    Opt(name:, short:, default: _, help:, constraint:) ->
-      Opt(name:, short:, default: None, help:, constraint: fn(arg) {
-        use a <- result.try(constraint(arg))
+    Opt(name:, short:, default: _, help:, try_map:) ->
+      Opt(name:, short:, default: None, help:, try_map: fn(arg) {
+        use a <- result.try(try_map(arg))
         f(a)
       })
   }
 }
 
-pub fn with_default(opt: Opt(a), default: a) -> Opt(a) {
+pub fn default(opt: Opt(a), default: a) -> Opt(a) {
   case opt {
-    Opt(name:, short:, default: _, help:, constraint:) ->
-      Opt(name:, short:, default: Some(default), help:, constraint:)
+    Opt(name:, short:, default: _, help:, try_map:) ->
+      Opt(name:, short:, default: Some(default), help:, try_map:)
   }
 }
 
 pub fn help(opt: Opt(a), help: String) -> Opt(a) {
   case opt {
-    Opt(name:, short:, default:, help: _, constraint:) ->
-      Opt(name:, short:, default:, help: Some(help), constraint:)
+    Opt(name:, short:, default:, help: _, try_map:) ->
+      Opt(name:, short:, default:, help: Some(help), try_map:)
   }
 }
 
 pub fn named(name: String) -> Opt(String) {
-  Opt(name:, short: None, default: None, help: None, constraint: Ok)
+  Opt(name:, short: None, default: None, help: None, try_map: Ok)
 }
 
 pub fn short(opt: Opt(String), short_name: String) -> Opt(String) {
   case opt {
-    Opt(name:, short: _, default:, help:, constraint:) ->
-      Opt(name:, short: Some(short_name), default:, help:, constraint:)
+    Opt(name:, short: _, default:, help:, try_map:) ->
+      Opt(name:, short: Some(short_name), default:, help:, try_map:)
   }
 }
 
 pub fn int(opt: Opt(String)) -> Opt(Int) {
   opt
-  |> constrain(fn(val) {
+  |> try_map(fn(val) {
     int.parse(val)
     |> result.map_error(fn(_) { "Non-integer value provided for " <> opt.name })
   })
@@ -78,7 +78,7 @@ pub fn int(opt: Opt(String)) -> Opt(Int) {
 
 pub fn float(opt: Opt(String)) -> Opt(Float) {
   opt
-  |> constrain(fn(val) {
+  |> try_map(fn(val) {
     float.parse(val)
     |> result.map_error(fn(_) { "Non-float value provided for " <> opt.name })
   })
@@ -91,7 +91,7 @@ pub fn run(opt: Opt(a), args: Args) -> FnResult(a) {
   let names = [long_name, ..names] |> string.join(", ")
   case args, opt.default {
     [key, val, ..rest], _ if key == long_name || Some(key) == short_name -> {
-      use a <- result.try(opt.constraint(val))
+      use a <- result.try(opt.try_map(val))
       Ok(#(a, rest))
     }
     [head, ..rest], _ ->

@@ -3,6 +3,12 @@ import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/string
 
+pub type Repeat {
+  NoRepeat
+  ManyRepeat
+  Many1Repeat
+}
+
 pub type NamedInfo {
   NamedInfo(
     name: String,
@@ -13,7 +19,12 @@ pub type NamedInfo {
 }
 
 pub type PositionalInfo {
-  PositionalInfo(name: String, default: Option(String), help: Option(String))
+  PositionalInfo(
+    name: String,
+    default: Option(String),
+    help: Option(String),
+    repeat: Repeat,
+  )
 }
 
 pub type FlagInfo {
@@ -25,7 +36,6 @@ pub type ArgInfo {
     named: List(NamedInfo),
     positional: List(PositionalInfo),
     flags: List(FlagInfo),
-    rest: Option(String),
   )
 }
 
@@ -54,15 +64,16 @@ fn flag_str(f_info: FlagInfo) -> String {
 }
 
 fn pos_str(p_info: PositionalInfo) -> String {
-  let #(start, end) = case p_info.default {
-    Some(_) -> #("[", "]")
-    None -> #("(", ")")
+  let name = string.uppercase(p_info.name)
+  let name = case p_info.repeat {
+    NoRepeat -> name
+    _ -> ".." <> name
   }
-  start <> string.uppercase(p_info.name) <> end
+  name
 }
 
 pub fn empty() -> ArgInfo {
-  ArgInfo(named: [], positional: [], flags: [], rest: None)
+  ArgInfo(named: [], positional: [], flags: [])
 }
 
 pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
@@ -70,7 +81,6 @@ pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
     named: list.append(a.named, b.named),
     positional: list.append(a.positional, b.positional),
     flags: list.append(a.flags, b.flags),
-    rest: option.or(a.rest, b.rest),
   )
 }
 
@@ -94,18 +104,12 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
     |> list.map(string.length)
     |> list.fold(0, int.max)
 
-  let rest_args = case info.rest {
-    Some(name) -> ["[..." <> string.uppercase(name) <> "]"]
-    None -> []
-  }
-
   let usage =
     string.join(
       [name]
         |> list.append(named_args)
         |> list.append(flag_args)
-        |> list.append(pos_args)
-        |> list.append(rest_args),
+        |> list.append(pos_args),
       " ",
     )
 
@@ -117,15 +121,23 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
         |> pos_str
         |> string.pad_right(max_size, " ")
 
-      case p_info.default {
-        None -> name <> "\t" <> p_info.help |> option.unwrap("")
-        Some(v) ->
-          name
-          <> "\t"
-          <> p_info.help
+      let help_text = case p_info.repeat, p_info.default {
+        ManyRepeat, _ ->
+          p_info.help
+          |> option.map(fn(h) { h <> " (zero or more)" })
+          |> option.unwrap("Zero or more")
+        Many1Repeat, _ ->
+          p_info.help
+          |> option.map(fn(h) { h <> " (one or more)" })
+          |> option.unwrap("One or more")
+        NoRepeat, None -> p_info.help |> option.unwrap("")
+        NoRepeat, Some(v) ->
+          p_info.help
           |> option.map(fn(h) { h <> " (default: " <> v <> ")" })
-          |> option.unwrap("default: " <> v)
+          |> option.unwrap("Default: " <> v)
       }
+
+      name <> "\t" <> help_text
     })
     |> string.join("\n")
 
@@ -144,7 +156,7 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
           <> "\t"
           <> n_info.help
           |> option.map(fn(h) { h <> " (default: " <> v <> ")" })
-          |> option.unwrap("default: " <> v)
+          |> option.unwrap("Default: " <> v)
       }
     })
     |> string.join("\n")
@@ -170,7 +182,7 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
 
   let opt_lines = case string.is_empty(opt_desc) {
     True -> []
-    False -> ["Available options:", opt_desc]
+    False -> ["Options:", opt_desc]
   }
 
   string.join(

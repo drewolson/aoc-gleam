@@ -35,17 +35,22 @@ pub fn arg(command: Command(fn(a) -> b), arg: Arg(a)) -> Command(b) {
   apply(command, Command(info: arg.to_arg_info(arg), f: arg.run(arg, _)))
 }
 
-pub fn flag(command: Command(fn(Bool) -> b), flag: Flag) -> Command(b) {
-  apply(command, Command(info: flag.to_arg_info(flag), f: flag.run(flag, _)))
-}
-
-pub fn rest(command: Command(fn(List(String)) -> b), name: String) -> Command(b) {
+pub fn arg_many(command: Command(fn(List(a)) -> b), arg: Arg(a)) -> Command(b) {
   apply(
     command,
-    Command(info: ArgInfo(..arg_info.empty(), rest: Some(name)), f: fn(args) {
-      Ok(#(args, []))
-    }),
+    Command(info: arg.to_arg_info_many(arg), f: arg.run_many(arg, _)),
   )
+}
+
+pub fn arg_many1(command: Command(fn(List(a)) -> b), arg: Arg(a)) -> Command(b) {
+  apply(
+    command,
+    Command(info: arg.to_arg_info_many1(arg), f: arg.run_many1(arg, _)),
+  )
+}
+
+pub fn flag(command: Command(fn(Bool) -> b), flag: Flag) -> Command(b) {
+  apply(command, Command(info: flag.to_arg_info(flag), f: flag.run(flag, _)))
 }
 
 pub fn info(command: Command(a)) -> ArgInfo {
@@ -70,7 +75,7 @@ pub fn add_help(
       case args {
         ["-h", ..] | ["--help", ..] ->
           Error(arg_info.help_text(
-            arg_info.merge(help_info, command.info),
+            arg_info.merge(command.info, help_info),
             name,
             description,
           ))

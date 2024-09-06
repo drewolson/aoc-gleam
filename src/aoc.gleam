@@ -12,7 +12,7 @@ fn day_opt() {
   |> opt.short("d")
   |> opt.help("Day to run")
   |> opt.int
-  |> opt.constrain(fn(day) {
+  |> opt.try_map(fn(day) {
     case day > 0 && day <= 25 {
       True -> Ok(day)
       False -> Error("Day must be between 1 and 25")
@@ -25,7 +25,7 @@ fn part_opt() {
   |> opt.short("p")
   |> opt.help("Part to run")
   |> opt.int
-  |> opt.constrain(fn(part) {
+  |> opt.try_map(fn(part) {
     case part == 1 || part == 2 {
       True -> Ok(part)
       False -> Error("Part must be 1 or 2")
@@ -38,13 +38,13 @@ fn year_opt() {
   |> opt.short("y")
   |> opt.help("Year to run")
   |> opt.int
-  |> opt.constrain(fn(year) {
+  |> opt.try_map(fn(year) {
     case year == 2023 {
       True -> Ok(year)
       False -> Error("Invalid year")
     }
   })
-  |> opt.with_default(2023)
+  |> opt.default(2023)
 }
 
 fn command() {
