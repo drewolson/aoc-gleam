@@ -18,7 +18,7 @@ pub fn help(flag: Flag, help: String) -> Flag {
   Flag(..flag, help: Some(help))
 }
 
-pub fn named(name: String) -> Flag {
+pub fn new(name: String) -> Flag {
   Flag(name:, help: None, short: None)
 }
 

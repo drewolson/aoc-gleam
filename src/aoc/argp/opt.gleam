@@ -57,7 +57,7 @@ pub fn help(opt: Opt(a), help: String) -> Opt(a) {
   }
 }
 
-pub fn named(name: String) -> Opt(String) {
+pub fn new(name: String) -> Opt(String) {
   Opt(name:, short: None, default: None, help: None, try_map: Ok)
 }
 

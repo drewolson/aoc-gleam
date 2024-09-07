@@ -8,7 +8,7 @@ type Args {
 }
 
 fn day_opt() {
-  opt.named("day")
+  opt.new("day")
   |> opt.short("d")
   |> opt.help("Day to run")
   |> opt.int
@@ -21,7 +21,7 @@ fn day_opt() {
 }
 
 fn part_opt() {
-  opt.named("part")
+  opt.new("part")
   |> opt.short("p")
   |> opt.help("Part to run")
   |> opt.int
@@ -34,7 +34,7 @@ fn part_opt() {
 }
 
 fn year_opt() {
-  opt.named("year")
+  opt.new("year")
   |> opt.short("y")
   |> opt.help("Year to run")
   |> opt.int
