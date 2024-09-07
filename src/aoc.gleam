@@ -2,9 +2,15 @@ import aoc/argp
 import aoc/argp/opt
 import argv
 import gleam/io
+import gleam/set
+import gleam/string
 
 type Args {
   Args(year: Int, day: Int, part: Int)
+}
+
+fn valid_years() {
+  set.from_list([2023])
 }
 
 fn day_opt() {
@@ -39,9 +45,11 @@ fn year_opt() {
   |> opt.help("Year to run")
   |> opt.int
   |> opt.try_map(fn(year) {
-    case year == 2023 {
+    let years = valid_years()
+    let years_str = years |> set.to_list |> string.inspect
+    case set.contains(years, year) {
       True -> Ok(year)
-      False -> Error("Invalid year")
+      False -> Error("Year must be in " <> years_str)
     }
   })
   |> opt.default(2023)
