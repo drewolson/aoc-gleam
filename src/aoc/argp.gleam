@@ -53,10 +53,6 @@ pub fn flag(command: Command(fn(Bool) -> b), flag: Flag) -> Command(b) {
   apply(command, Command(info: flag.to_arg_info(flag), f: flag.run(flag, _)))
 }
 
-pub fn info(command: Command(a)) -> ArgInfo {
-  command.info
-}
-
 pub fn add_help(
   command: Command(a),
   name: String,
