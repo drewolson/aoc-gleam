@@ -36,6 +36,7 @@ pub type ArgInfo {
     named: List(NamedInfo),
     positional: List(PositionalInfo),
     flags: List(FlagInfo),
+    subcommands: List(String),
   )
 }
 
@@ -73,7 +74,7 @@ fn pos_str(p_info: PositionalInfo) -> String {
 }
 
 pub fn empty() -> ArgInfo {
-  ArgInfo(named: [], positional: [], flags: [])
+  ArgInfo(named: [], positional: [], flags: [], subcommands: [])
 }
 
 pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
@@ -81,10 +82,15 @@ pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
     named: list.append(a.named, b.named),
     positional: list.append(a.positional, b.positional),
     flags: list.append(a.flags, b.flags),
+    subcommands: list.append(a.subcommands, b.subcommands),
   )
 }
 
 pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
+  let sub_args = case info.subcommands {
+    [] -> []
+    _ -> ["[COMMAND]"]
+  }
   let named_args =
     info.named
     |> list.map(named_str)
@@ -107,11 +113,17 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
   let usage =
     string.join(
       [name]
+        |> list.append(sub_args)
         |> list.append(named_args)
         |> list.append(flag_args)
         |> list.append(pos_args),
       " ",
     )
+
+  let sub_desc =
+    info.subcommands
+    |> list.map(fn(sub) { "  " <> sub })
+    |> string.join("\n")
 
   let pos_desc =
     info.positional
@@ -139,6 +151,7 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
 
       name <> "\t" <> help_text
     })
+    |> list.map(fn(l) { "  " <> l })
     |> string.join("\n")
 
   let named_desc =
@@ -159,6 +172,7 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
           |> option.unwrap("Default: " <> v)
       }
     })
+    |> list.map(fn(l) { "  " <> l })
     |> string.join("\n")
 
   let flag_desc =
@@ -171,9 +185,18 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
       <> f_info.help
       |> option.unwrap("")
     })
+    |> list.map(fn(l) { "  " <> l })
     |> string.join("\n")
 
-  let opt_desc = string.join([named_desc, flag_desc], "\n")
+  let opt_desc =
+    [named_desc, flag_desc]
+    |> list.filter(fn(desc) { desc != "" })
+    |> string.join("\n")
+
+  let sub_lines = case string.is_empty(sub_desc) {
+    True -> []
+    False -> ["Commands:", sub_desc]
+  }
 
   let pos_lines = case string.is_empty(pos_desc) {
     True -> []
@@ -186,13 +209,10 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
   }
 
   string.join(
-    [name <> " -- " <> description, "Usage: " <> usage]
+    [name <> " -- " <> description, "Usage:\n\n  " <> usage]
+      |> list.append(sub_lines)
       |> list.append(pos_lines)
       |> list.append(opt_lines),
     "\n\n",
   )
-}
-
-pub fn usage_text(_info: ArgInfo, name: String) -> String {
-  "For usage information, run\n  " <> name <> " --help"
 }

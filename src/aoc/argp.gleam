@@ -1,11 +1,11 @@
 import aoc/argp/arg.{type Arg}
 import aoc/argp/flag.{type Flag}
-import aoc/argp/internal/aliases.{type ArgsFn}
+import aoc/argp/internal/aliases.{type Args, type ArgsFn, type FnResult}
 import aoc/argp/internal/arg_info.{type ArgInfo, ArgInfo, FlagInfo}
 import aoc/argp/opt.{type Opt}
+import gleam/list
 import gleam/option.{Some}
 import gleam/result
-import gleam/string
 
 pub opaque type Command(a) {
   Command(info: ArgInfo, f: ArgsFn(a))
@@ -25,6 +25,10 @@ pub fn apply(mf: Command(fn(a) -> b), ma: Command(a)) -> Command(b) {
 
 pub fn command(f: fn(a) -> b) -> Command(fn(a) -> b) {
   pure(f)
+}
+
+pub fn fail(message: String) -> Command(a) {
+  Command(info: arg_info.empty(), f: fn(_args) { Error(message) })
 }
 
 pub fn opt(command: Command(fn(a) -> b), opt: Opt(a)) -> Command(b) {
@@ -53,6 +57,34 @@ pub fn flag(command: Command(fn(Bool) -> b), flag: Flag) -> Command(b) {
   apply(command, Command(info: flag.to_arg_info(flag), f: flag.run(flag, _)))
 }
 
+fn run_subcommands(
+  subcommands: List(#(String, Command(a))),
+  default: Command(a),
+  args: Args,
+) -> FnResult(a) {
+  case subcommands, args {
+    [#(name, command), ..], [head, ..rest] if name == head -> command.f(rest)
+    [_, ..rest], _ -> run_subcommands(rest, default, args)
+    [], _ -> default.f(args)
+  }
+}
+
+pub fn subcommands_with_default(
+  subcommands: List(#(String, Command(a))),
+  default: Command(a),
+) -> Command(a) {
+  let sub_names = list.map(subcommands, fn(p) { p.0 })
+  let sub_arg_info = ArgInfo(..default.info, subcommands: sub_names)
+  apply(
+    pure(fn(a) { a }),
+    Command(info: sub_arg_info, f: run_subcommands(subcommands, default, _)),
+  )
+}
+
+pub fn subcommands(subcommands: List(#(String, Command(a)))) -> Command(a) {
+  subcommands_with_default(subcommands, fail("No subcommand provided"))
+}
+
 pub fn add_help(
   command: Command(a),
   name: String,
@@ -75,11 +107,7 @@ pub fn add_help(
             name,
             description,
           ))
-        other ->
-          command.f(other)
-          |> result.map_error(fn(e) {
-            string.join([e, arg_info.usage_text(command.info, name)], "\n\n")
-          })
+        other -> command.f(other)
       }
     },
   )
