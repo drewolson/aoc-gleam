@@ -87,9 +87,13 @@ pub fn merge(a: ArgInfo, b: ArgInfo) -> ArgInfo {
 }
 
 pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
-  let sub_args = case info.subcommands {
+  let sub_usage = case info.subcommands {
     [] -> []
-    _ -> ["[COMMAND]"]
+    _ -> ["<COMMAND>"]
+  }
+  let opt_usage = case info.named, info.flags {
+    [], [] -> []
+    _, _ -> ["[OPTIONS]"]
   }
   let named_args =
     info.named
@@ -113,9 +117,8 @@ pub fn help_text(info: ArgInfo, name: String, description: String) -> String {
   let usage =
     string.join(
       [name]
-        |> list.append(sub_args)
-        |> list.append(named_args)
-        |> list.append(flag_args)
+        |> list.append(sub_usage)
+        |> list.append(opt_usage)
         |> list.append(pos_args),
       " ",
     )
