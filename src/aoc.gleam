@@ -1,13 +1,11 @@
 import aoc/argp
 import aoc/argp/opt
+import aoc/runner
 import argv
 import gleam/io
+import gleam/result
 import gleam/set
 import gleam/string
-
-type Args {
-  Args(year: Int, day: Int, part: Int)
-}
 
 fn valid_years() {
   set.from_list([2023])
@@ -56,23 +54,22 @@ fn year_opt() {
 }
 
 fn command() {
-  argp.command(fn(year) { fn(day) { fn(part) { Args(year, day, part) } } })
+  argp.command(fn(year) { fn(day) { fn(part) { run(year, day, part) } } })
   |> argp.opt(year_opt())
   |> argp.opt(day_opt())
   |> argp.opt(part_opt())
 }
 
-pub fn main() {
-  let result =
-    command()
-    |> argp.add_help("aoc", "run aoc solution")
-    |> argp.run(argv.load().arguments)
-
-  case result {
-    Error(e) -> io.println_error(e)
-    Ok(args) -> {
-      io.debug(args)
-      Nil
-    }
+fn run(year: Int, day: Int, part: Int) -> Nil {
+  case runner.run(year, day, part) {
+    Ok(output) -> io.println(output)
+    Error(error) -> io.println_error(error)
   }
+}
+
+pub fn main() {
+  command()
+  |> argp.add_help("aoc", "run aoc solution")
+  |> argp.run(argv.load().arguments)
+  |> result.map_error(io.println_error)
 }
