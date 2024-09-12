@@ -1,7 +1,7 @@
-import aoc/argp
-import aoc/argp/opt
 import aoc/runner
 import argv
+import clip
+import clip/opt
 import gleam/io
 import gleam/result
 import gleam/set
@@ -54,10 +54,10 @@ fn year_opt() {
 }
 
 fn command() {
-  argp.command(fn(year) { fn(day) { fn(part) { run(year, day, part) } } })
-  |> argp.opt(year_opt())
-  |> argp.opt(day_opt())
-  |> argp.opt(part_opt())
+  clip.command(fn(year) { fn(day) { fn(part) { run(year, day, part) } } })
+  |> clip.opt(year_opt())
+  |> clip.opt(day_opt())
+  |> clip.opt(part_opt())
 }
 
 fn run(year: Int, day: Int, part: Int) -> Nil {
@@ -69,7 +69,7 @@ fn run(year: Int, day: Int, part: Int) -> Nil {
 
 pub fn main() {
   command()
-  |> argp.add_help("aoc", "run aoc solution")
-  |> argp.run(argv.load().arguments)
+  |> clip.add_help("aoc", "run aoc solution")
+  |> clip.run(argv.load().arguments)
   |> result.map_error(io.println_error)
 }
