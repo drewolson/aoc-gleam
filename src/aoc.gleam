@@ -54,22 +54,17 @@ fn year_opt() {
 }
 
 fn command() {
-  clip.command(fn(year) { fn(day) { fn(part) { run(year, day, part) } } })
+  clip.command(fn(year) { fn(day) { fn(part) { runner.run(year, day, part) } } })
   |> clip.opt(year_opt())
   |> clip.opt(day_opt())
   |> clip.opt(part_opt())
-}
-
-fn run(year: Int, day: Int, part: Int) -> Nil {
-  case runner.run(year, day, part) {
-    Ok(output) -> io.println(output)
-    Error(error) -> io.println_error(error)
-  }
 }
 
 pub fn main() {
   command()
   |> clip.add_help("aoc", "run aoc solution")
   |> clip.run(argv.load().arguments)
+  |> result.flatten
+  |> result.map(io.println)
   |> result.map_error(io.println_error)
 }
