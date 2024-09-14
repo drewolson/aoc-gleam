@@ -1,12 +1,12 @@
-import aoc/util
+import aoc/util/regex_util
+import aoc/util/str_util
 import gleam/int
 import gleam/list
 import gleam/regex
-import gleam/result
 import gleam/string
 
 fn to_digit(line: String) -> Result(Int, Nil) {
-  use re <- result.try(util.make_regex("[0-9]"))
+  let re = regex_util.make_regex("[0-9]")
   let f_match = regex.scan(re, line)
   let b_match = regex.scan(re, string.reverse(line))
 
@@ -18,7 +18,7 @@ fn to_digit(line: String) -> Result(Int, Nil) {
 
 pub fn part1(input: String) -> Int {
   input
-  |> util.lines
+  |> str_util.lines
   |> list.filter_map(to_digit)
   |> list.fold(0, fn(a, b) { a + b })
 }
