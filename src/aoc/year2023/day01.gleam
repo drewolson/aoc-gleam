@@ -1,13 +1,13 @@
 import aoc/util/regex_util
 import aoc/util/str_util
-import gleam/dict
+import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/regex
 import gleam/result
 import gleam/string
 
-fn int_map() {
+fn int_map() -> Dict(String, String) {
   dict.from_list([
     #("zero", "0"),
     #("one", "1"),
