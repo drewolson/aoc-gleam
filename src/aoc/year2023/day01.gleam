@@ -1,7 +1,9 @@
+import aoc/util/memoize
 import aoc/util/regex_util
 import aoc/util/str_util
 import gleam/dict.{type Dict}
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/regex
 import gleam/result
