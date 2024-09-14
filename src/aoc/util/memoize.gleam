@@ -7,9 +7,7 @@ type MemoFn(a, b) =
 
 type Message(k, v) {
   Shutdown
-
   Insert(key: k, value: v)
-
   Get(key: k, reply_with: Subject(Result(v, Nil)))
 }
 
@@ -19,10 +17,7 @@ fn handle_message(
 ) -> Next(Message(k, v), Dict(k, v)) {
   case message {
     Shutdown -> actor.Stop(process.Normal)
-    Insert(key, value) -> {
-      let new_state = dict.insert(cache, key, value)
-      actor.continue(new_state)
-    }
+    Insert(key, value) -> cache |> dict.insert(key, value) |> actor.continue
     Get(key, client) -> {
       cache |> dict.get(key) |> process.send(client, _)
       actor.continue(cache)
@@ -43,9 +38,9 @@ fn memoize_aux(cache: Subject(Message(a, b)), f: MemoFn(a, b)) -> fn(a) -> b {
   }
 }
 
-pub fn memoize(fun: MemoFn(a, b), f: fn(fn(a) -> b) -> c) -> c {
+pub fn memoize(f: MemoFn(a, b), k: fn(fn(a) -> b) -> c) -> c {
   let assert Ok(cache) = actor.start(dict.new(), handle_message)
-  let result = f(memoize_aux(cache, fun))
+  let result = k(memoize_aux(cache, f))
   process.send(cache, Shutdown)
   result
 }
