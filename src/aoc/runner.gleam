@@ -9,7 +9,10 @@ pub fn run(year: Int, day: Int, part: Int) {
   let year_str = string.inspect(year)
   let day_str = day |> string.inspect |> string.pad_left(2, "0")
   let path = "./data/" <> year_str <> "/day" <> day_str <> ".txt"
-  use content <- result.try(read_file(path))
+  use content <- result.try(
+    read_file(path)
+    |> result.replace_error("Could not read file: " <> path),
+  )
 
   case year {
     2023 -> year2023.run(content, day, part)
