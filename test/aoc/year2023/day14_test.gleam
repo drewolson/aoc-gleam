@@ -1,8 +1,7 @@
 import aoc/year2023/day14
 import gleeunit/should
 
-const input = "
-O....#....
+const input = "O....#....
 O.OO#....#
 .....##...
 OO.#O....O

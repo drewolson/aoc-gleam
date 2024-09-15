@@ -1,15 +1,13 @@
 import aoc/year2023/day01
 import gleeunit/should
 
-const input = "
-1abc2
+const input = "1abc2
 pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet
 "
 
-const input2 = "
-two1nine
+const input2 = "two1nine
 eightwothree
 abcone2threexyz
 xtwone3four
