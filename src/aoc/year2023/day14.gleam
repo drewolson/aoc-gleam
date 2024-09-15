@@ -54,18 +54,18 @@ fn cycle(grid: Grid) -> Grid {
   |> list.fold(grid, fn(grid, _) { grid |> tilt |> rotate })
 }
 
-fn run_cycles(grid: Grid, hashtbl: Hashtbl(Grid, Int), n: Int) -> Grid {
+fn run_cycles(grid: Grid, cache: Hashtbl(Grid, Int), n: Int) -> Grid {
   case n {
     0 -> grid
     n -> {
-      case hashtbl.get(hashtbl, grid) {
+      case hashtbl.get(cache, grid) {
         Ok(i) -> {
           let assert Ok(rem) = int.remainder(n, i - n)
-          grid |> cycle |> run_cycles(hashtbl, rem - 1)
+          grid |> cycle |> run_cycles(cache, rem - 1)
         }
         Error(Nil) -> {
-          hashtbl.insert(hashtbl, grid, n)
-          grid |> cycle |> run_cycles(hashtbl, n - 1)
+          hashtbl.insert(cache, grid, n)
+          grid |> cycle |> run_cycles(cache, n - 1)
         }
       }
     }
