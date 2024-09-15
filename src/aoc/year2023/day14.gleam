@@ -20,17 +20,17 @@ fn rotate(grid: Grid) -> Grid {
   |> list.map(list.reverse)
 }
 
-fn shift_rocks_aux(p: #(List(String), List(String)), rock: String) {
-  case rock, p {
-    "O", #(rocks, l) -> #(["O", ..rocks], l)
-    ".", #(rocks, l) -> #(rocks, [".", ..l])
-    "#", #(rocks, l) -> #([], list.append(["#", ..rocks], l))
-    _, p -> p
-  }
-}
-
 fn shift_rocks(l: List(String)) -> List(String) {
-  let #(rocks, l) = list.fold(l, #([], []), shift_rocks_aux)
+  let #(rocks, l) =
+    list.fold(l, #([], []), fn(acc, rock) {
+      case rock, acc {
+        "O", #(rocks, l) -> #(["O", ..rocks], l)
+        ".", #(rocks, l) -> #(rocks, [".", ..l])
+        "#", #(rocks, l) -> #([], list.append(["#", ..rocks], l))
+        _, p -> p
+      }
+    })
+
   rocks |> list.append(l) |> list.reverse
 }
 
@@ -82,6 +82,7 @@ pub fn part1(input: String) -> Int {
 
 pub fn part2(input: String) -> Int {
   use cache <- hashtbl.new()
+
   input
   |> parse
   |> run_cycles(cache, 1_000_000_000)
