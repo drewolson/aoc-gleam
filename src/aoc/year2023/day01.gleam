@@ -1,5 +1,5 @@
-import aoc/util/regex_util
-import aoc/util/str_util
+import aoc/util/re
+import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
@@ -23,7 +23,7 @@ fn int_map() -> Dict(String, String) {
 }
 
 fn to_digit(line: String) -> Result(Int, Nil) {
-  let re = regex_util.make_regex("[0-9]")
+  let re = re.make_regex("[0-9]")
   let f_match = regex.scan(re, line)
   let b_match = regex.scan(re, string.reverse(line))
 
@@ -44,8 +44,8 @@ fn to_digit2(line: String) -> Result(Int, Nil) {
     int_map()
     |> dict.keys()
     |> string.join("|")
-  let re_f = regex_util.make_regex("[0-9]|" <> words)
-  let re_b = regex_util.make_regex("[0-9]|" <> string.reverse(words))
+  let re_f = re.make_regex("[0-9]|" <> words)
+  let re_b = re.make_regex("[0-9]|" <> string.reverse(words))
   let f_match = regex.scan(re_f, line)
   let b_match = regex.scan(re_b, string.reverse(line))
 
@@ -61,14 +61,14 @@ fn to_digit2(line: String) -> Result(Int, Nil) {
 
 pub fn part1(input: String) -> Int {
   input
-  |> str_util.lines
+  |> str.lines
   |> list.filter_map(to_digit)
   |> list.fold(0, fn(a, b) { a + b })
 }
 
 pub fn part2(input: String) -> Int {
   input
-  |> str_util.lines
+  |> str.lines
   |> list.filter_map(to_digit2)
   |> list.fold(0, fn(a, b) { a + b })
 }
