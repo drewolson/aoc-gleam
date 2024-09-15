@@ -4,7 +4,7 @@ import gleam/otp/actor.{type Next}
 import gleam/result
 
 pub opaque type Hashtbl(k, v) {
-  Hashtbl(Subject(Message(k, v)))
+  Hashtbl(Int, Subject(Message(k, v)))
 }
 
 type Message(k, v) {
@@ -39,19 +39,23 @@ pub fn get_or(hashtbl: Hashtbl(k, v), key: k, f: fn() -> v) -> v {
 
 pub fn insert(hashtbl: Hashtbl(k, v), key: k, value: v) -> Nil {
   case hashtbl {
-    Hashtbl(h) -> process.send(h, Insert(key, value))
+    Hashtbl(_, h) -> process.send(h, Insert(key, value))
   }
 }
 
 pub fn get(hashtbl: Hashtbl(k, v), key: k) -> Result(v, Nil) {
   case hashtbl {
-    Hashtbl(h) -> process.call(h, Get(key, _), 10)
+    Hashtbl(t, h) -> process.call(h, Get(key, _), t)
   }
 }
 
-pub fn new(f: fn(Hashtbl(a, b)) -> c) -> c {
+pub fn new_with_timeout(timeout: Int, f: fn(Hashtbl(a, b)) -> c) -> c {
   let assert Ok(hashtbl) = actor.start(dict.new(), handle_message)
-  let result = f(Hashtbl(hashtbl))
+  let result = f(Hashtbl(timeout, hashtbl))
   process.send(hashtbl, Shutdown)
   result
+}
+
+pub fn new(f: fn(Hashtbl(a, b)) -> c) -> c {
+  new_with_timeout(10, f)
 }
