@@ -34,3 +34,8 @@ pub fn int() -> party.Parser(Int, String) {
   |> int.parse
   |> result.replace_error("Not a valid integer")
 }
+
+pub fn go(str: String, p: Parser(a)) -> a {
+  let assert Ok(v) = party.go(p, str)
+  v
+}

@@ -1,7 +1,6 @@
 import aoc/util/parser.{type Parser}
 import gleam/int
 import gleam/list
-import gleam/result
 import party
 
 type Color {
@@ -85,16 +84,14 @@ fn valid_game(game: Game) -> Bool {
 
 pub fn part1(input: String) -> Int {
   input
-  |> party.go(games_p(), _)
-  |> result.unwrap([])
+  |> parser.go(games_p())
   |> list.filter(valid_game)
   |> list.fold(0, fn(sum, g) { sum + g.id })
 }
 
 pub fn part2(input: String) -> Int {
   input
-  |> party.go(games_p(), _)
-  |> result.unwrap([])
+  |> parser.go(games_p())
   |> list.map(fn(game) {
     let #(r, g, b) = game_count(game)
     r * g * b
