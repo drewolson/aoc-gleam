@@ -5,7 +5,7 @@ import gleam/otp/actor.{type Next}
 import gleam/result
 
 pub opaque type Hashtbl(k, v) {
-  Hashtbl(Int, Subject(Message(k, v)))
+  Hashtbl(timeout: Int, subject: Subject(Message(k, v)))
 }
 
 type Message(k, v) {
@@ -55,45 +55,31 @@ pub fn get_or(hashtbl: Hashtbl(k, v), key: k, f: fn() -> v) -> v {
 }
 
 pub fn insert(hashtbl: Hashtbl(k, v), key: k, value: v) -> Nil {
-  case hashtbl {
-    Hashtbl(_, h) -> process.send(h, Insert(key, value))
-  }
+  process.send(hashtbl.subject, Insert(key, value))
 }
 
 pub fn get(hashtbl: Hashtbl(k, v), key: k) -> Result(v, Nil) {
-  case hashtbl {
-    Hashtbl(t, h) -> process.call(h, Get(key, _), t)
-  }
+  process.call(hashtbl.subject, Get(key, _), hashtbl.timeout)
 }
 
 pub fn delete(hashtbl: Hashtbl(k, v), key: k) -> Nil {
-  case hashtbl {
-    Hashtbl(_, h) -> process.send(h, Delete(key))
-  }
+  process.send(hashtbl.subject, Delete(key))
 }
 
 pub fn to_list(hashtbl: Hashtbl(k, v)) -> List(#(k, v)) {
-  case hashtbl {
-    Hashtbl(t, h) -> process.call(h, ToList, t)
-  }
+  process.call(hashtbl.subject, ToList, hashtbl.timeout)
 }
 
 pub fn size(hashtbl: Hashtbl(k, v)) -> Int {
-  case hashtbl {
-    Hashtbl(t, h) -> process.call(h, Size, t)
-  }
+  process.call(hashtbl.subject, Size, hashtbl.timeout)
 }
 
 pub fn upsert(hashtbl: Hashtbl(k, v), key: k, f: fn(Option(v)) -> v) -> Nil {
-  case hashtbl {
-    Hashtbl(_, h) -> process.send(h, Upsert(key, f))
-  }
+  process.send(hashtbl.subject, Upsert(key, f))
 }
 
 pub fn map_values(hashtbl: Hashtbl(k, v), f: fn(k, v) -> v) -> Nil {
-  case hashtbl {
-    Hashtbl(_, h) -> process.send(h, MapValues(f))
-  }
+  process.send(hashtbl.subject, MapValues(f))
 }
 
 pub fn from_list_with_timeout(
@@ -101,9 +87,9 @@ pub fn from_list_with_timeout(
   timeout: Int,
   f: fn(Hashtbl(k, v)) -> a,
 ) -> a {
-  let assert Ok(hashtbl) = actor.start(dict.from_list(list), handle_message)
-  let result = f(Hashtbl(timeout, hashtbl))
-  process.send(hashtbl, Shutdown)
+  let assert Ok(subject) = actor.start(dict.from_list(list), handle_message)
+  let result = f(Hashtbl(timeout:, subject:))
+  process.send(subject, Shutdown)
   result
 }
 

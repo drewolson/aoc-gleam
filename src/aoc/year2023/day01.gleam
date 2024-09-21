@@ -23,7 +23,7 @@ fn int_map() -> Dict(String, String) {
 }
 
 fn to_digit(line: String) -> Result(Int, Nil) {
-  let re = re.make_regex("[0-9]")
+  let re = re.from_string("[0-9]")
   let f_match = regex.scan(re, line)
   let b_match = regex.scan(re, string.reverse(line))
 
@@ -44,8 +44,8 @@ fn to_digit2(line: String) -> Result(Int, Nil) {
     int_map()
     |> dict.keys()
     |> string.join("|")
-  let re_f = re.make_regex("[0-9]|" <> words)
-  let re_b = re.make_regex("[0-9]|" <> string.reverse(words))
+  let re_f = re.from_string("[0-9]|" <> words)
+  let re_b = re.from_string("[0-9]|" <> string.reverse(words))
   let f_match = regex.scan(re_f, line)
   let b_match = regex.scan(re_b, string.reverse(line))
 
