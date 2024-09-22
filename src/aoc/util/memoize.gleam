@@ -1,15 +1,11 @@
-import aoc/util/hashtbl.{type Hashtbl}
+import aoc/util/fix.{type FixFn}
+import aoc/util/hashtbl
 
-type MemoFn(a, b) =
-  fn(fn(a) -> b, a) -> b
+pub fn memoize(f: FixFn(a, b), k: fn(fn(a) -> b) -> c) -> c {
+  use cache <- hashtbl.new()
 
-fn memoize_aux(cache: Hashtbl(a, b), f: MemoFn(a, b)) -> fn(a) -> b {
-  fn(a: a) -> b {
-    hashtbl.get_or(cache, a, fn() { f(memoize_aux(cache, f), a) })
-  }
-}
+  let aux =
+    fix.fix(fn(recur, a) { hashtbl.get_or_lazy(cache, a, fn() { f(recur, a) }) })
 
-pub fn memoize(f: MemoFn(a, b), k: fn(fn(a) -> b) -> c) -> c {
-  use hashtbl <- hashtbl.new()
-  k(memoize_aux(hashtbl, f))
+  k(aux)
 }
