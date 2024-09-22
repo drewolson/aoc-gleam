@@ -44,7 +44,7 @@ fn handle_message(
   }
 }
 
-pub fn get_or(hashtbl: Hashtbl(k, v), key: k, f: fn() -> v) -> v {
+pub fn get_or_lazy(hashtbl: Hashtbl(k, v), key: k, f: fn() -> v) -> v {
   hashtbl
   |> get(key)
   |> result.lazy_unwrap(fn() {
