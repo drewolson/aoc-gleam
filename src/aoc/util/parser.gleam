@@ -35,6 +35,19 @@ pub fn int() -> party.Parser(Int, String) {
   |> result.replace_error("Not a valid integer")
 }
 
+pub fn signed_int() -> party.Parser(Int, String) {
+  use mult <- party.do(
+    party.choice([
+      party.string("+") |> replace(1),
+      party.string("-") |> replace(-1),
+      party.return(1),
+    ]),
+  )
+  use i <- party.do(int())
+
+  party.return(mult * i)
+}
+
 pub fn go(str: String, p: Parser(a)) -> a {
   let assert Ok(v) = party.go(p, str)
   v
