@@ -55,9 +55,9 @@ fn year_opt() {
 
 fn command() {
   clip.command({
-    use year <- clip.param
-    use day <- clip.param
-    use part <- clip.param
+    use year <- clip.parameter
+    use day <- clip.parameter
+    use part <- clip.parameter
 
     runner.run(year, day, part)
   })
