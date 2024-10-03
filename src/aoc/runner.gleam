@@ -1,16 +1,15 @@
 import aoc/runner/year2023
 import gleam/result
 import gleam/string
-
-@external(erlang, "file", "read_file")
-fn read_file(path: String) -> Result(String, String)
+import simplifile
 
 pub fn run(year: Int, day: Int, part: Int) {
   let year_str = string.inspect(year)
   let day_str = day |> string.inspect |> string.pad_left(2, "0")
   let path = "./data/" <> year_str <> "/day" <> day_str <> ".txt"
   use content <- result.try(
-    read_file(path)
+    path
+    |> simplifile.read
     |> result.replace_error("Could not read file: " <> path),
   )
 

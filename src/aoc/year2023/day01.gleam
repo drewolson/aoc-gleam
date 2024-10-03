@@ -1,3 +1,4 @@
+import aoc/util/li
 import aoc/util/re
 import aoc/util/str
 import gleam/dict.{type Dict}
@@ -63,12 +64,12 @@ pub fn part1(input: String) -> Int {
   input
   |> str.lines
   |> list.filter_map(to_digit)
-  |> list.fold(0, fn(a, b) { a + b })
+  |> li.sum
 }
 
 pub fn part2(input: String) -> Int {
   input
   |> str.lines
   |> list.filter_map(to_digit2)
-  |> list.fold(0, fn(a, b) { a + b })
+  |> li.sum
 }

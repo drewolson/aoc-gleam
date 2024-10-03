@@ -1,3 +1,4 @@
+import aoc/util/li
 import aoc/util/parser.{type Parser}
 import gleam/int
 import gleam/list
@@ -96,5 +97,5 @@ pub fn part2(input: String) -> Int {
     let #(r, g, b) = game_count(game)
     r * g * b
   })
-  |> list.fold(0, fn(sum, power) { sum + power })
+  |> li.sum
 }

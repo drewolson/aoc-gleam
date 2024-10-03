@@ -1,11 +1,16 @@
-import aoc/util/hashtbl.{type Hashtbl}
+import aoc/util/li
+import aoc/util/state.{type State} as s
 import aoc/util/str
+import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/string
 
 type Grid =
   List(List(String))
+
+type Cache =
+  Dict(Grid, Int)
 
 fn parse(input: String) -> Grid {
   input
@@ -54,18 +59,20 @@ fn cycle(grid: Grid) -> Grid {
   |> list.fold(grid, fn(grid, _) { grid |> tilt |> rotate })
 }
 
-fn run_cycles(grid: Grid, cache: Hashtbl(Grid, Int), n: Int) -> Grid {
+fn run_cycles(grid: Grid, n: Int) -> State(Cache, Grid) {
   case n {
-    0 -> grid
+    0 -> s.return(grid)
     n -> {
-      case hashtbl.get(cache, grid) {
+      use result <- s.do(s.gets(dict.get(_, grid)))
+
+      case result {
         Ok(i) -> {
           let assert Ok(rem) = int.remainder(n, i - n)
-          grid |> cycle |> run_cycles(cache, rem - 1)
+          grid |> cycle |> run_cycles(rem - 1)
         }
         Error(Nil) -> {
-          hashtbl.insert(cache, grid, n)
-          grid |> cycle |> run_cycles(cache, n - 1)
+          use _ <- s.do(s.modify(dict.insert(_, grid, n)))
+          grid |> cycle |> run_cycles(n - 1)
         }
       }
     }
@@ -77,15 +84,14 @@ pub fn part1(input: String) -> Int {
   |> parse
   |> tilt
   |> list.map(load)
-  |> list.fold(0, fn(a, b) { a + b })
+  |> li.sum
 }
 
 pub fn part2(input: String) -> Int {
-  use cache <- hashtbl.new()
-
   input
   |> parse
-  |> run_cycles(cache, 1_000_000_000)
+  |> run_cycles(1_000_000_000)
+  |> s.eval(dict.new())
   |> list.map(load)
-  |> list.fold(0, fn(a, b) { a + b })
+  |> li.sum
 }
