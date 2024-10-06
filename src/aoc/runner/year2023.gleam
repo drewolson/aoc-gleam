@@ -12,7 +12,7 @@ pub fn run(input: String, day: Int, part: Int) {
     14, 1 -> input |> day14.part1 |> string.inspect
     14, 2 -> input |> day14.part2 |> string.inspect
     _, _ ->
-      "Unknown day and part: day "
+      "Unknown day and part for 2023: day "
       <> string.inspect(day)
       <> ", part "
       <> string.inspect(part)

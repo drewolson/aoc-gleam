@@ -8,7 +8,7 @@ import gleam/set
 import gleam/string
 
 fn valid_years() {
-  set.from_list([2023])
+  set.from_list([2023, 2024])
 }
 
 fn day_opt() {
@@ -50,7 +50,7 @@ fn year_opt() {
       False -> Error("Year must be in " <> years_str)
     }
   })
-  |> opt.default(2023)
+  |> opt.default(2024)
 }
 
 fn command() {

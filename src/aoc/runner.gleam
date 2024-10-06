@@ -1,4 +1,5 @@
 import aoc/runner/year2023
+import aoc/runner/year2024
 import gleam/result
 import gleam/string
 import simplifile
@@ -15,6 +16,7 @@ pub fn run(year: Int, day: Int, part: Int) {
 
   case year {
     2023 -> year2023.run(content, day, part)
+    2024 -> year2024.run(content, day, part)
     _ -> "Unkown year: " <> year_str
   }
   |> Ok
