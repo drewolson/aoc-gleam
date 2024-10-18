@@ -9,9 +9,7 @@ pub fn keep(
   pa: party.Parser(a, e),
   pb: party.Parser(b, e),
 ) -> party.Parser(b, e) {
-  use _ <- party.do(pa)
-  use b <- party.do(pb)
-  party.return(b)
+  party.seq(pa, pb)
 }
 
 pub fn skip(
