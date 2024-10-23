@@ -1,6 +1,7 @@
 import aoc/runner
 import argv
 import clip
+import clip/help
 import clip/opt
 import gleam/io
 import gleam/result
@@ -68,7 +69,7 @@ fn command() {
 
 pub fn main() {
   command()
-  |> clip.add_help("aoc", "run aoc solution")
+  |> clip.help(help.simple("aoc", "run aoc solution"))
   |> clip.run(argv.load().arguments)
   |> result.flatten
   |> result.map(io.println)
