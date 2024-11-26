@@ -1,6 +1,6 @@
-import gleam/regex.{type Regex}
+import gleam/regexp.{type Regexp}
 
-pub fn from_string(str: String) -> Regex {
-  let assert Ok(re) = regex.from_string(str)
+pub fn from_string(str: String) -> Regexp {
+  let assert Ok(re) = regexp.from_string(str)
   re
 }

@@ -4,7 +4,7 @@ import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
-import gleam/regex
+import gleam/regexp
 import gleam/result
 import gleam/string
 
@@ -25,8 +25,8 @@ fn int_map() -> Dict(String, String) {
 
 fn to_digit(line: String) -> Result(Int, Nil) {
   let re = re.from_string("[0-9]")
-  let f_match = regex.scan(re, line)
-  let b_match = regex.scan(re, string.reverse(line))
+  let f_match = regexp.scan(re, line)
+  let b_match = regexp.scan(re, string.reverse(line))
 
   case f_match, b_match {
     [a, ..], [b, ..] -> int.parse(a.content <> b.content)
@@ -47,8 +47,8 @@ fn to_digit2(line: String) -> Result(Int, Nil) {
     |> string.join("|")
   let re_f = re.from_string("[0-9]|" <> words)
   let re_b = re.from_string("[0-9]|" <> string.reverse(words))
-  let f_match = regex.scan(re_f, line)
-  let b_match = regex.scan(re_b, string.reverse(line))
+  let f_match = regexp.scan(re_f, line)
+  let b_match = regexp.scan(re_b, string.reverse(line))
 
   case f_match, b_match {
     [a, ..], [b, ..] -> {
