@@ -1,3 +1,4 @@
+import aoc/util/str
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -5,24 +6,22 @@ import gleam/result
 import gleam/string
 
 pub fn part1(input: String) -> Int {
-  input
-  |> string.trim_end
-  |> string.split("\n")
-  |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
-  |> list.transpose
-  |> list.map(list.sort(_, int.compare))
-  |> list.transpose
-  |> list.fold(0, fn(sum, l) {
-    let assert [a, b] = l
-    int.absolute_value(a - b) + sum
-  })
+  let assert [a, b] =
+    input
+    |> str.lines
+    |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
+    |> list.transpose
+    |> list.map(list.sort(_, int.compare))
+
+  a
+  |> list.zip(b)
+  |> list.fold(0, fn(sum, p) { int.absolute_value(p.0 - p.1) + sum })
 }
 
 pub fn part2(input: String) -> Int {
   let assert [a, b] =
     input
-    |> string.trim_end
-    |> string.split("\n")
+    |> str.lines
     |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
     |> list.transpose
 
