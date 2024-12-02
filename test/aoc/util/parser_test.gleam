@@ -32,28 +32,19 @@ pub fn signed_int_negative_test() {
   result == Ok(-n)
 }
 
-pub fn keep_test() {
+pub fn drop_test() {
   use #(a, b) <- qcheck.given(qcheck.tuple2(
     qcheck.string_non_empty(),
     qcheck.string_non_empty(),
   ))
 
   let input = a <> b
-  let p = party.string(a) |> parser.keep(party.string(b))
+  let p = {
+    use <- parser.drop(party.string(a))
+    use b <- party.do(party.string(b))
+    party.return(b)
+  }
   let result = party.go(p, input)
 
   result == Ok(b)
-}
-
-pub fn skip_test() {
-  use #(a, b) <- qcheck.given(qcheck.tuple2(
-    qcheck.string_non_empty(),
-    qcheck.string_non_empty(),
-  ))
-
-  let input = a <> b
-  let p = party.string(a) |> parser.skip(party.string(b))
-  let result = party.go(p, input)
-
-  result == Ok(a)
 }

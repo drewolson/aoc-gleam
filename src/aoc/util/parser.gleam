@@ -5,20 +5,12 @@ import party
 pub type Parser(a) =
   party.Parser(a, String)
 
-pub fn keep(
+pub fn drop(
   pa: party.Parser(a, e),
-  pb: party.Parser(b, e),
+  f: fn() -> party.Parser(b, e),
 ) -> party.Parser(b, e) {
-  party.seq(pa, pb)
-}
-
-pub fn skip(
-  pa: party.Parser(a, e),
-  pb: party.Parser(b, e),
-) -> party.Parser(a, e) {
-  use a <- party.do(pa)
-  use _ <- party.do(pb)
-  party.return(a)
+  use _ <- party.do(pa)
+  f()
 }
 
 pub fn replace(p: party.Parser(a, e), b: b) -> party.Parser(b, e) {
