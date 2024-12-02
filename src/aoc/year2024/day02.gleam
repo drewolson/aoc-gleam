@@ -2,6 +2,7 @@ import aoc/util/str
 import gleam/int
 import gleam/list
 import gleam/string
+import gleam/yielder.{type Yielder}
 
 fn safe(l: List(Int)) -> Bool {
   let diffs =
@@ -13,10 +14,13 @@ fn safe(l: List(Int)) -> Bool {
   || list.all(diffs, fn(d) { d >= -3 && d < 0 })
 }
 
-fn perms(l: List(Int)) -> List(List(Int)) {
+fn perms(l: List(Int)) -> Yielder(List(Int)) {
   case l {
-    [] -> [[]]
-    [h, ..t] -> t |> perms |> list.map(fn(l) { [h, ..l] }) |> list.prepend(t)
+    [] -> yielder.single([])
+    [h, ..t] -> {
+      use <- yielder.yield(t)
+      t |> perms |> yielder.map(fn(l) { [h, ..l] })
+    }
   }
 }
 
@@ -31,5 +35,5 @@ pub fn part2(input: String) -> Int {
   input
   |> str.lines
   |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
-  |> list.count(fn(r) { r |> perms |> list.any(safe) })
+  |> list.count(fn(r) { r |> perms |> yielder.any(safe) })
 }
