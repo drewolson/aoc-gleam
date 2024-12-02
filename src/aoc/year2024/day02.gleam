@@ -33,5 +33,5 @@ pub fn part2(input: String) -> Int {
   input
   |> str.lines
   |> list.map(str.nums)
-  |> list.count(fn(r) { r |> perms |> yielder.any(safe) })
+  |> list.count(fn(l) { l |> perms |> yielder.any(safe) })
 }
