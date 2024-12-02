@@ -13,6 +13,13 @@ pub fn drop(
   f()
 }
 
+pub fn do(
+  pa: party.Parser(a, e),
+  f: fn(a) -> party.Parser(b, e),
+) -> party.Parser(b, e) {
+  party.do(pa, f)
+}
+
 pub fn replace(p: party.Parser(a, e), b: b) -> party.Parser(b, e) {
   party.map(p, fn(_) { b })
 }

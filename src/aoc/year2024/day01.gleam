@@ -3,13 +3,12 @@ import gleam/dict
 import gleam/int
 import gleam/list
 import gleam/result
-import gleam/string
 
 pub fn part1(input: String) -> Int {
   let assert [a, b] =
     input
     |> str.lines
-    |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
+    |> list.map(str.nums)
     |> list.transpose
     |> list.map(list.sort(_, int.compare))
 
@@ -22,7 +21,7 @@ pub fn part2(input: String) -> Int {
   let assert [a, b] =
     input
     |> str.lines
-    |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
+    |> list.map(str.nums)
     |> list.transpose
 
   let map = list.group(b, fn(a) { a })

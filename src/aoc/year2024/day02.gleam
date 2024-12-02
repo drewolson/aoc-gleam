@@ -1,7 +1,5 @@
 import aoc/util/str
-import gleam/int
 import gleam/list
-import gleam/string
 import gleam/yielder.{type Yielder}
 
 fn safe(l: List(Int)) -> Bool {
@@ -27,13 +25,13 @@ fn perms(l: List(Int)) -> Yielder(List(Int)) {
 pub fn part1(input: String) -> Int {
   input
   |> str.lines
-  |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
+  |> list.map(str.nums)
   |> list.count(safe)
 }
 
 pub fn part2(input: String) -> Int {
   input
   |> str.lines
-  |> list.map(fn(l) { l |> string.split(" ") |> list.filter_map(int.parse) })
+  |> list.map(str.nums)
   |> list.count(fn(r) { r |> perms |> yielder.any(safe) })
 }
