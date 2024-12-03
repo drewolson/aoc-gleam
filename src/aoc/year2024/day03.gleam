@@ -1,5 +1,8 @@
 import aoc/util/parser.{type Parser}
+import gleam/int
 import gleam/list
+import gleam/result
+import gleam/string
 import party
 
 type Token {
@@ -8,12 +11,21 @@ type Token {
   Dont
 }
 
+fn int() -> Parser(Int) {
+  use digits <- party.try(party.digits())
+
+  case string.length(digits) > 3 {
+    True -> Error("int too long")
+    False -> digits |> int.parse |> result.replace_error("not an int")
+  }
+}
+
 fn mul_p() -> Parser(Token) {
   party.return(fn(a) { fn(b) { Mul(a:, b:) } })
   |> parser.skip(party.string("mul("))
-  |> parser.keep(parser.int())
+  |> parser.keep(int())
   |> parser.skip(party.string(","))
-  |> parser.keep(parser.int())
+  |> parser.keep(int())
   |> parser.skip(party.string(")"))
 }
 
