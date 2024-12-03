@@ -1,36 +1,59 @@
-import aoc/util/re
-import gleam/int
+import aoc/util/parser.{type Parser}
 import gleam/list
-import gleam/option
-import gleam/regexp.{type Match, type Regexp}
-import gleam/result
-import gleam/string
+import party
 
-fn mul_re() -> Regexp {
-  re.from_string("mul\\(([0-9]{1,3}),([0-9]{1,3})\\)")
+type Token {
+  Mul(a: Int, b: Int)
+  Do
+  Dont
 }
 
-fn mul(m: Match) -> Int {
-  m.submatches
-  |> list.filter_map(fn(s) {
-    s |> option.to_result(Nil) |> result.then(int.parse)
-  })
-  |> list.fold(1, fn(p, n) { p * n })
+fn mul_p() -> Parser(Token) {
+  party.return(fn(a) { fn(b) { Mul(a:, b:) } })
+  |> parser.skip(party.string("mul("))
+  |> parser.keep(parser.int())
+  |> parser.skip(party.string(","))
+  |> parser.keep(parser.int())
+  |> parser.skip(party.string(")"))
+}
+
+fn token_p() -> Parser(Token) {
+  party.choice([
+    party.string("don't()") |> parser.replace(Dont),
+    party.string("do()") |> parser.replace(Do),
+    mul_p(),
+    party.lazy(fn() { party.seq(party.any_char(), token_p()) }),
+  ])
+}
+
+fn tokens_p() -> Parser(List(Token)) {
+  party.many1(token_p())
 }
 
 pub fn part1(input: String) -> Int {
-  mul_re()
-  |> regexp.scan(input)
-  |> list.fold(0, fn(s, m) { s + mul(m) })
+  input
+  |> parser.go(tokens_p())
+  |> list.fold(0, fn(s, t) {
+    case t {
+      Mul(a:, b:) -> s + a * b
+      _ -> s
+    }
+  })
 }
 
 pub fn part2(input: String) -> Int {
-  { "do()" <> input }
-  |> string.split("don't()")
-  |> list.fold(0, fn(sum, s) {
-    case string.split_once(s, "do()") {
-      Error(_) -> sum
-      Ok(#(_, t)) -> sum + part1(t)
-    }
-  })
+  let #(count, _) =
+    input
+    |> parser.go(tokens_p())
+    |> list.fold(#(0, True), fn(p, t) {
+      let #(count, go) = p
+      case t {
+        Dont -> #(count, False)
+        Do -> #(count, True)
+        Mul(a:, b:) if go -> #(count + a * b, go)
+        _ -> p
+      }
+    })
+
+  count
 }

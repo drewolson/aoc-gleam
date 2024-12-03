@@ -24,6 +24,24 @@ pub fn replace(p: party.Parser(a, e), b: b) -> party.Parser(b, e) {
   party.map(p, fn(_) { b })
 }
 
+pub fn keep(
+  pf: party.Parser(fn(a) -> b, e),
+  pa: party.Parser(a, e),
+) -> party.Parser(b, e) {
+  use f <- party.do(pf)
+  use a <- party.do(pa)
+  party.return(f(a))
+}
+
+pub fn skip(
+  pa: party.Parser(a, e),
+  pb: party.Parser(b, e),
+) -> party.Parser(a, e) {
+  use a <- party.do(pa)
+  use _ <- party.do(pb)
+  party.return(a)
+}
+
 pub fn int() -> party.Parser(Int, String) {
   use digits <- party.try(party.digits())
 
