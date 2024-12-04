@@ -29,18 +29,21 @@ fn find_keys(grid: Grid, val: String) -> List(Coord) {
 
 fn words(grid: Grid, c: Coord) -> List(String) {
   let #(x, y) = c
-  let rays = [
-    [#(x, y), #(x + 1, y), #(x + 2, y), #(x + 3, y)],
-    [#(x, y), #(x - 1, y), #(x - 2, y), #(x - 3, y)],
-    [#(x, y), #(x, y + 1), #(x, y + 2), #(x, y + 3)],
-    [#(x, y), #(x, y - 1), #(x, y - 2), #(x, y - 3)],
-    [#(x, y), #(x + 1, y + 1), #(x + 2, y + 2), #(x + 3, y + 3)],
-    [#(x, y), #(x - 1, y + 1), #(x - 2, y + 2), #(x - 3, y + 3)],
-    [#(x, y), #(x + 1, y - 1), #(x + 2, y - 2), #(x + 3, y - 3)],
-    [#(x, y), #(x - 1, y - 1), #(x - 2, y - 2), #(x - 3, y - 3)],
-  ]
 
-  rays
+  list.range(1, 3)
+  |> list.map(fn(i) {
+    [
+      #(x + i, y),
+      #(x - i, y),
+      #(x, y + i),
+      #(x, y - i),
+      #(x + i, y + i),
+      #(x - i, y + i),
+      #(x + i, y - i),
+      #(x - i, y - i),
+    ]
+  })
+  |> list.transpose
   |> list.map(fn(ray) {
     ray
     |> list.filter_map(dict.get(grid, _))
@@ -50,8 +53,8 @@ fn words(grid: Grid, c: Coord) -> List(String) {
 
 fn xs(grid: Grid, c: Coord) -> String {
   let #(x, y) = c
-  let a = [#(x - 1, y - 1), #(x, y), #(x + 1, y + 1)]
-  let b = [#(x - 1, y + 1), #(x, y), #(x + 1, y - 1)]
+  let a = [#(x - 1, y - 1), #(x + 1, y + 1)]
+  let b = [#(x - 1, y + 1), #(x + 1, y - 1)]
 
   [a, b]
   |> list.flat_map(fn(l) {
@@ -62,10 +65,10 @@ fn xs(grid: Grid, c: Coord) -> String {
 
 pub fn part1(input: String) -> Int {
   let grid = parse(input)
-  let xs = find_keys(grid, "X")
-  xs
+  let starts = find_keys(grid, "X")
+  starts
   |> list.flat_map(words(grid, _))
-  |> list.count(fn(w) { w == "XMAS" })
+  |> list.count(fn(w) { w == "MAS" })
 }
 
 pub fn part2(input: String) -> Int {
@@ -73,5 +76,5 @@ pub fn part2(input: String) -> Int {
   let starts = find_keys(grid, "A")
   starts
   |> list.map(xs(grid, _))
-  |> list.count(fn(w) { w == "AMSAMS" })
+  |> list.count(fn(w) { w == "MSMS" })
 }
