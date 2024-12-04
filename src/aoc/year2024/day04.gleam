@@ -53,10 +53,11 @@ fn xs(grid: Grid, c: Coord) -> String {
   let a = [#(x - 1, y - 1), #(x, y), #(x + 1, y + 1)]
   let b = [#(x - 1, y + 1), #(x, y), #(x + 1, y - 1)]
 
-  let l = a |> list.filter_map(dict.get(grid, _)) |> list.sort(string.compare)
-  let r = b |> list.filter_map(dict.get(grid, _)) |> list.sort(string.compare)
-
-  l |> list.append(r) |> string.join("")
+  [a, b]
+  |> list.flat_map(fn(l) {
+    l |> list.filter_map(dict.get(grid, _)) |> list.sort(string.compare)
+  })
+  |> string.join("")
 }
 
 pub fn part1(input: String) -> Int {
