@@ -27,7 +27,7 @@ fn find_keys(grid: Grid, val: String) -> List(Coord) {
   |> dict.keys
 }
 
-fn words(grid: Grid, c: Coord) -> List(String) {
+fn rays(grid: Grid, c: Coord) -> List(String) {
   let #(x, y) = c
 
   list.range(1, 3)
@@ -66,14 +66,16 @@ fn xs(grid: Grid, c: Coord) -> String {
 pub fn part1(input: String) -> Int {
   let grid = parse(input)
   let starts = find_keys(grid, "X")
+
   starts
-  |> list.flat_map(words(grid, _))
+  |> list.flat_map(rays(grid, _))
   |> list.count(fn(w) { w == "MAS" })
 }
 
 pub fn part2(input: String) -> Int {
   let grid = parse(input)
   let starts = find_keys(grid, "A")
+
   starts
   |> list.map(xs(grid, _))
   |> list.count(fn(w) { w == "MSMS" })
