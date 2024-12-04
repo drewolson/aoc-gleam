@@ -38,8 +38,8 @@ fn words(grid: Grid, c: Coord) -> List(String) {
       #(x, y + i),
       #(x, y - i),
       #(x + i, y + i),
-      #(x - i, y + i),
       #(x + i, y - i),
+      #(x - i, y + i),
       #(x - i, y - i),
     ]
   })
