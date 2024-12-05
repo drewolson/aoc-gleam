@@ -17,10 +17,10 @@ type Reqs =
   Dict(Int, Set(Int))
 
 fn rule_p() -> Parser(Rule) {
-  party.return(fn(a) { fn(b) { #(a, b) } })
-  |> parser.keep(parser.int())
-  |> parser.skip(party.string("|"))
-  |> parser.keep(parser.int())
+  use a <- party.do(parser.int())
+  use <- parser.drop(party.string("|"))
+  use b <- party.map(parser.int())
+  #(a, b)
 }
 
 fn rules_p() -> Parser(List(Rule)) {
