@@ -98,7 +98,7 @@ fn reorder(
         reqs,
         all,
         next |> set.from_list |> set.union(seen),
-        list.append(acc, next),
+        list.append(next, acc),
       )
     }
   }
