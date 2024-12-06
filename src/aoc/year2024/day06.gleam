@@ -59,15 +59,13 @@ fn next_pos(guard: Guard, grid: Grid) -> Result(Guard, Nil) {
 
   use next <- result.map(dict.get(grid, coord))
 
-  let new_dir = case dir {
-    Up -> Right
-    Right -> Down
-    Down -> Left
-    Left -> Up
-  }
-
   case next {
-    "#" -> #(#(x, y), new_dir)
+    "#" -> #(#(x, y), case dir {
+      Up -> Right
+      Right -> Down
+      Down -> Left
+      Left -> Up
+    })
     _ -> #(coord, dir)
   }
 }
