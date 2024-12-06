@@ -58,31 +58,28 @@ fn next_pos(guard: Guard, grid: Grid) -> Result(Guard, Nil) {
 
   use next <- result.map(dict.get(grid, coord))
 
+  let new_dir = case dir {
+    Up -> Right
+    Right -> Down
+    Down -> Left
+    Left -> Up
+  }
+
   case next {
-    "#" -> {
-      let new_dir = case dir {
-        Up -> Right
-        Right -> Down
-        Down -> Left
-        Left -> Up
-      }
-      #(#(x, y), new_dir)
-    }
+    "#" -> #(#(x, y), new_dir)
     _ -> #(coord, dir)
   }
 }
 
 fn move(guard: Guard, grid: Grid, seen: Set(Coord)) -> Set(Coord) {
-  let next = next_pos(guard, grid)
-  case next {
+  case next_pos(guard, grid) {
     Error(_) -> seen
     Ok(new_guard) -> move(new_guard, grid, set.insert(seen, new_guard.0))
   }
 }
 
 fn is_loop(grid: Grid, guard: Guard, seen: Set(Guard)) -> Bool {
-  let next = next_pos(guard, grid)
-  case next {
+  case next_pos(guard, grid) {
     Error(_) -> False
     Ok(new_guard) -> {
       case set.contains(seen, new_guard) {
