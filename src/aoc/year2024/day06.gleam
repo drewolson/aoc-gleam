@@ -1,6 +1,7 @@
 import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/list
+import gleam/otp/task
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
@@ -106,9 +107,12 @@ pub fn part2(input: String) -> Int {
   grid
   |> dict.filter(fn(_, v) { v == "." })
   |> dict.keys
-  |> list.count(fn(c) {
-    grid
-    |> dict.insert(c, "#")
-    |> is_loop(#(pos, Up), set.from_list([#(pos, Up)]))
+  |> list.map(fn(c) {
+    task.async(fn() {
+      grid
+      |> dict.insert(c, "#")
+      |> is_loop(#(pos, Up), set.from_list([#(pos, Up)]))
+    })
   })
+  |> list.count(task.await_forever)
 }
