@@ -1,7 +1,6 @@
 import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/list
-import gleam/otp/task
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
@@ -101,16 +100,14 @@ pub fn part1(input: String) -> Int {
 pub fn part2(input: String) -> Int {
   let grid = parse(input)
   let pos = find_guard(grid)
+  let guard = #(pos, Up)
 
-  grid
-  |> dict.filter(fn(_, v) { v == "." })
-  |> dict.keys
-  |> list.map(fn(c) {
-    task.async(fn() {
-      grid
-      |> dict.insert(c, "#")
-      |> is_loop(#(pos, Up), set.from_list([#(pos, Up)]))
-    })
+  guard
+  |> move(grid, set.from_list([pos]))
+  |> set.to_list
+  |> list.count(fn(c) {
+    grid
+    |> dict.insert(c, "#")
+    |> is_loop(guard, set.from_list([guard]))
   })
-  |> list.count(task.await_forever)
 }
