@@ -2,8 +2,7 @@ import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/list
 import gleam/option.{None, Some}
-import gleam/result
-import gleam/set
+import gleam/set.{type Set}
 import gleam/string
 
 type Coord =
@@ -63,46 +62,48 @@ fn pairs(l: List(a)) -> List(#(a, a)) {
   }
 }
 
-fn antinodes(nodes: List(Coord)) -> List(Coord) {
-  nodes
-  |> pairs
-  |> list.flat_map(fn(p) {
-    let #(a, b) = p
-    let #(a1, a2) = a
-    let #(b1, b2) = b
+fn next(acc: Set(Coord), grid: Grid, c: Coord, dx: Int, dy: Int) -> Set(Coord) {
+  let new = #(c.0 + dx, c.1 + dy)
 
-    [
-      #({ b1 - a1 } + b1, { b2 - a2 } + b2),
-      #({ a1 - b1 } + a1, { a2 - b2 } + a2),
-    ]
-  })
-}
-
-fn search(grid: Grid, c: Coord, dx: Int, dy: Int, acc: List(Coord)) {
-  case dict.get(grid, c) {
+  case dict.get(grid, new) {
     Error(_) -> acc
-    Ok(_) -> search(grid, #(c.0 + dx, c.1 + dy), dx, dy, [c, ..acc])
+    Ok(_) -> set.insert(acc, new)
   }
 }
 
-fn antinodes2(grid: Grid, nodes: List(Coord)) -> List(Coord) {
+fn search(acc: Set(Coord), grid: Grid, c: Coord, dx: Int, dy: Int) -> Set(Coord) {
+  case dict.get(grid, c) {
+    Error(_) -> acc
+    Ok(_) -> search(set.insert(acc, c), grid, #(c.0 + dx, c.1 + dy), dx, dy)
+  }
+}
+
+fn antinodes(
+  f: fn(Set(Coord), Grid, Coord, Int, Int) -> Set(Coord),
+  acc: Set(Coord),
+  grid: Grid,
+  nodes: List(Coord),
+) -> Set(Coord) {
   nodes
   |> pairs
-  |> list.flat_map(fn(p) {
+  |> list.fold(acc, fn(s, p) {
     let #(a, b) = p
     let dx = b.0 - a.0
     let dy = b.1 - a.1
-    list.append(search(grid, b, dx, dy, []), search(grid, a, -dx, -dy, []))
+
+    s
+    |> f(grid, b, dx, dy)
+    |> f(grid, a, -dx, -dy)
   })
 }
 
 pub fn part1(input: String) -> Int {
   let #(grid, nodes) = parse(input)
+
   nodes
   |> dict.values
-  |> list.flat_map(antinodes)
-  |> list.unique
-  |> list.count(fn(an) { grid |> dict.get(an) |> result.is_ok })
+  |> list.fold(set.new(), fn(s, ns) { antinodes(next, s, grid, ns) })
+  |> set.size
 }
 
 pub fn part2(input: String) -> Int {
@@ -110,8 +111,6 @@ pub fn part2(input: String) -> Int {
 
   nodes
   |> dict.values
-  |> list.fold(set.new(), fn(s, ns) {
-    grid |> antinodes2(ns) |> set.from_list |> set.union(s)
-  })
+  |> list.fold(set.new(), fn(s, ns) { antinodes(search, s, grid, ns) })
   |> set.size
 }
