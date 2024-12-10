@@ -50,7 +50,7 @@ fn is_valid(c: Coord, grid: Grid, score: Int) -> Bool {
 
 fn score(
   grid: Grid,
-  f: fn(List(#(Int, Int))) -> List(#(Int, Int)),
+  f: fn(List(Coord)) -> List(Coord),
   curr: List(Coord),
   acc: Int,
 ) -> Int {
@@ -77,20 +77,19 @@ fn score(
   }
 }
 
-pub fn part1(input: String) -> Int {
+fn solve(input: String, f: fn(List(Coord)) -> List(Coord)) -> Int {
   let grid = make_grid(input)
   let heads = find_heads(grid)
 
   heads
-  |> list.map(fn(head) { score(grid, list.unique, [head], 0) })
+  |> list.map(fn(head) { score(grid, f, [head], 0) })
   |> li.sum
 }
 
-pub fn part2(input: String) -> Int {
-  let grid = make_grid(input)
-  let heads = find_heads(grid)
+pub fn part1(input: String) -> Int {
+  solve(input, list.unique)
+}
 
-  heads
-  |> list.map(fn(head) { score(grid, function.identity, [head], 0) })
-  |> li.sum
+pub fn part2(input: String) -> Int {
+  solve(input, function.identity)
 }
