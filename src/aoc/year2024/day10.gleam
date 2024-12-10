@@ -63,13 +63,12 @@ fn score(
         curr
         |> list.filter_map(fn(c) {
           use v <- result.map(dict.get(grid, c))
-          #(c, v)
-        })
-        |> list.flat_map(fn(p) {
-          p.0
+
+          c
           |> neighbors(grid)
-          |> list.filter(is_valid(_, grid, p.1))
+          |> list.filter(is_valid(_, grid, v))
         })
+        |> list.flatten
         |> f
 
       score(grid, f, next, acc)
