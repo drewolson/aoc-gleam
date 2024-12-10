@@ -1,10 +1,10 @@
 import aoc/util/li
 import aoc/util/str
 import gleam/dict.{type Dict}
+import gleam/function
 import gleam/int
 import gleam/list
 import gleam/result
-import gleam/set.{type Set}
 import gleam/string
 
 type Coord =
@@ -48,47 +48,31 @@ fn is_valid(c: Coord, grid: Grid, score: Int) -> Bool {
   dict.get(grid, c) == Ok(score + 1)
 }
 
-fn score(grid: Grid, curr: Set(Coord), acc: Int) -> Int {
-  case set.is_empty(curr) {
+fn score(
+  grid: Grid,
+  f: fn(List(#(Int, Int))) -> List(#(Int, Int)),
+  curr: List(Coord),
+  acc: Int,
+) -> Int {
+  case list.is_empty(curr) {
     True -> acc
     False -> {
-      let acc =
-        acc
-        + {
-          curr
-          |> set.to_list
-          |> list.count(fn(c) { dict.get(grid, c) == Ok(9) })
-        }
+      let acc = acc + list.count(curr, fn(c) { dict.get(grid, c) == Ok(9) })
+
       let next =
         curr
-        |> set.to_list
         |> list.filter_map(fn(c) {
           use v <- result.map(dict.get(grid, c))
           #(c, v)
         })
         |> list.flat_map(fn(p) {
-          let #(c, v) = p
-          c
+          p.0
           |> neighbors(grid)
-          |> list.filter(is_valid(_, grid, v))
+          |> list.filter(is_valid(_, grid, p.1))
         })
-        |> set.from_list
-      score(grid, next, acc)
-    }
-  }
-}
+        |> f
 
-fn score2(grid: Grid, curr: Coord) -> Int {
-  case dict.get(grid, curr) {
-    Error(_) -> 0
-    Ok(9) -> 1
-    Ok(s) -> {
-      let next =
-        curr
-        |> neighbors(grid)
-        |> list.filter(is_valid(_, grid, s))
-
-      list.fold(next, 0, fn(s, n) { s + score2(grid, n) })
+      score(grid, f, next, acc)
     }
   }
 }
@@ -98,7 +82,7 @@ pub fn part1(input: String) -> Int {
   let heads = find_heads(grid)
 
   heads
-  |> list.map(fn(head) { score(grid, set.from_list([head]), 0) })
+  |> list.map(fn(head) { score(grid, list.unique, [head], 0) })
   |> li.sum
 }
 
@@ -107,6 +91,6 @@ pub fn part2(input: String) -> Int {
   let heads = find_heads(grid)
 
   heads
-  |> list.map(fn(head) { score2(grid, head) })
+  |> list.map(fn(head) { score(grid, function.identity, [head], 0) })
   |> li.sum
 }
