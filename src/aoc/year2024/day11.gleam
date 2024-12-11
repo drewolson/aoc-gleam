@@ -32,7 +32,7 @@ fn expand(stone: Int, n: Int) -> State(Cache, Int) {
     Ok(n), _ -> state.return(n)
     _, 0 -> state.return(1)
     _, _ -> {
-      use res <- state.do(
+      use val <- state.do(
         stone
         |> split
         |> list.fold(state.return(0), fn(ssum, s) {
@@ -41,8 +41,8 @@ fn expand(stone: Int, n: Int) -> State(Cache, Int) {
           state.return(sum + next)
         }),
       )
-      use _ <- state.do(state.modify(dict.insert(_, #(stone, n), res)))
-      state.return(res)
+      use _ <- state.do(state.modify(dict.insert(_, #(stone, n), val)))
+      state.return(val)
     }
   }
 }
