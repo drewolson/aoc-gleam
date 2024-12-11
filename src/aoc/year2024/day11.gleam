@@ -4,7 +4,6 @@ import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/result
-import gleam/string
 
 type Cache =
   Dict(#(Int, Int), Int)
@@ -59,14 +58,12 @@ fn blink(stones: List(Int), n: Int) -> Int {
 
 pub fn part1(input: String) -> Int {
   input
-  |> string.trim
   |> str.nums
   |> blink(25)
 }
 
 pub fn part2(input: String) -> Int {
   input
-  |> string.trim
   |> str.nums
   |> blink(75)
 }
