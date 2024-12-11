@@ -26,9 +26,9 @@ fn split(stone: Int) -> List(Int) {
 }
 
 fn expand(stone: Int, n: Int) -> State(Cache, Int) {
-  use cache <- state.do(state.get())
+  use res <- state.do(state.gets(dict.get(_, #(stone, n))))
 
-  case dict.get(cache, #(stone, n)), n {
+  case res, n {
     Ok(n), _ -> state.return(n)
     _, 0 -> state.return(1)
     _, _ -> {
