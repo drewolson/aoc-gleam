@@ -63,7 +63,6 @@ fn score(
         curr
         |> list.filter_map(fn(c) {
           use v <- result.map(dict.get(grid, c))
-
           c
           |> neighbors(grid)
           |> list.filter(is_valid(_, grid, v))
