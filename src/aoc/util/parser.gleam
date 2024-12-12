@@ -5,21 +5,6 @@ import party
 pub type Parser(a) =
   party.Parser(a, String)
 
-pub fn drop(
-  pa: party.Parser(a, e),
-  f: fn() -> party.Parser(b, e),
-) -> party.Parser(b, e) {
-  use _ <- party.do(pa)
-  f()
-}
-
-pub fn do(
-  pa: party.Parser(a, e),
-  f: fn(a) -> party.Parser(b, e),
-) -> party.Parser(b, e) {
-  party.do(pa, f)
-}
-
 pub fn replace(p: party.Parser(a, e), b: b) -> party.Parser(b, e) {
   party.map(p, fn(_) { b })
 }

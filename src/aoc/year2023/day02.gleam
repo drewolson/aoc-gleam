@@ -31,7 +31,7 @@ fn color_p() -> Parser(Color) {
 
 fn draw_p() -> Parser(Draw) {
   use n <- party.do(parser.int())
-  use <- parser.drop(party.whitespace1())
+  use <- party.drop(party.whitespace1())
   use color <- party.do(color_p())
 
   party.return(Draw(n, color))
@@ -42,9 +42,9 @@ fn round_p() -> Parser(Round) {
 }
 
 fn game_p() -> Parser(Game) {
-  use <- parser.drop(party.string("Game "))
+  use <- party.drop(party.string("Game "))
   use n <- party.do(parser.int())
-  use <- parser.drop(party.string(": "))
+  use <- party.drop(party.string(": "))
   use rounds <- party.do(party.sep1(round_p(), party.string("; ")))
 
   party.return(Game(n, rounds))

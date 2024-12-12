@@ -18,7 +18,7 @@ type Reqs =
 
 fn rule_p() -> Parser(Rule) {
   use a <- party.do(parser.int())
-  use <- parser.drop(party.string("|"))
+  use <- party.drop(party.string("|"))
   use b <- party.map(parser.int())
   #(a, b)
 }
@@ -37,7 +37,7 @@ fn updates_p() -> Parser(List(Update)) {
 
 fn input_p() -> Parser(#(List(Rule), List(Update))) {
   use rules <- party.do(rules_p())
-  use <- parser.drop(party.string("\n\n"))
+  use <- party.drop(party.string("\n\n"))
   use updates <- party.map(updates_p())
   #(rules, updates)
 }

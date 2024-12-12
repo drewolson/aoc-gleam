@@ -9,7 +9,7 @@ type Op =
 
 fn op_p() -> Parser(Op) {
   use goal <- party.do(parser.int())
-  use <- parser.drop(party.string(": "))
+  use <- party.drop(party.string(": "))
   use l <- party.map(party.sep1(parser.int(), party.string(" ")))
 
   #(goal, l)
