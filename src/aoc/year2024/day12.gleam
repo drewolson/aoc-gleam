@@ -24,6 +24,21 @@ fn make_grid(str: String) -> Grid {
   |> dict.from_list
 }
 
+pub fn expand(input: String) -> String {
+  input
+  |> str.lines
+  |> list.flat_map(fn(l) {
+    let new_l =
+      l
+      |> string.to_graphemes
+      |> list.flat_map(fn(g) { [g, g] })
+      |> string.join("")
+
+    [new_l, new_l]
+  })
+  |> string.join("\n")
+}
+
 fn neighbors(coord: Coord) -> List(Coord) {
   let #(x, y) = coord
   [#(x + 1, y), #(x - 1, y), #(x, y + 1), #(x, y - 1)]
@@ -69,7 +84,7 @@ fn perimeter(set: Set(Coord)) -> Int {
 }
 
 fn corners(set: Set(Coord)) -> Int {
-  let perimeter =
+  let counts =
     set.fold(set, dict.new(), fn(d, c) {
       c
       |> neighbors
@@ -89,27 +104,12 @@ fn corners(set: Set(Coord)) -> Int {
     c
     |> diagonals
     |> list.filter(fn(d) {
-      !set.contains(set, d) && { dict.get(perimeter, d) != Ok(1) }
+      !set.contains(set, d) && { dict.get(counts, d) != Ok(1) }
     })
     |> set.from_list
     |> set.union(s)
   })
   |> set.size
-}
-
-pub fn expand(input: String) -> String {
-  input
-  |> str.lines
-  |> list.flat_map(fn(l) {
-    let new_l =
-      l
-      |> string.to_graphemes
-      |> list.flat_map(fn(g) { [g, g] })
-      |> string.join("")
-
-    [new_l, new_l]
-  })
-  |> string.join("\n")
 }
 
 fn find_groups(grid: Grid) -> List(Set(Coord)) {
