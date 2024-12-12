@@ -1,7 +1,7 @@
+import aoc/util/li
 import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/list
-import gleam/option.{None, Some}
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
@@ -72,39 +72,34 @@ fn flood(grid: Grid, curr: Set(Coord), seen: Set(Coord)) -> Set(Coord) {
   }
 }
 
-fn perimeter(set: Set(Coord)) -> Int {
-  set.fold(set, 0, fn(sum, c) {
-    sum
-    + {
-      c
-      |> neighbors
-      |> list.count(fn(n) { !set.contains(set, n) })
-    }
+fn perimeter_coords(set: Set(Coord)) -> List(Coord) {
+  set
+  |> set.to_list
+  |> list.flat_map(fn(c) {
+    c
+    |> neighbors
+    |> list.filter(fn(n) { !set.contains(set, n) })
   })
 }
 
+fn perimeter(set: Set(Coord)) -> Int {
+  set
+  |> perimeter_coords
+  |> list.length
+}
+
 fn corners(set: Set(Coord)) -> Int {
-  let counts =
-    set.fold(set, dict.new(), fn(d, c) {
-      c
-      |> neighbors
-      |> list.filter(fn(n) { !set.contains(set, n) })
-      |> list.fold(d, fn(d, n) {
-        dict.upsert(d, n, fn(o) {
-          case o {
-            None -> 1
-            Some(c) -> c + 1
-          }
-        })
-      })
-    })
+  let perimeter_counts =
+    set
+    |> perimeter_coords
+    |> li.counts
 
   set
   |> set.fold(set.new(), fn(s, c) {
     c
     |> diagonals
     |> list.filter(fn(d) {
-      !set.contains(set, d) && { dict.get(counts, d) != Ok(1) }
+      !set.contains(set, d) && { dict.get(perimeter_counts, d) != Ok(1) }
     })
     |> set.from_list
     |> set.union(s)
