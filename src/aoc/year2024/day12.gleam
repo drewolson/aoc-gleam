@@ -126,15 +126,16 @@ fn find_groups(grid: Grid) -> List(Set(Coord)) {
 }
 
 pub fn part1(input: String) -> Int {
-  let grid = make_grid(input)
-  let sets = find_groups(grid)
-
-  list.fold(sets, 0, fn(sum, set) { sum + set.size(set) * perimeter(set) })
+  input
+  |> make_grid
+  |> find_groups
+  |> list.fold(0, fn(sum, set) { sum + set.size(set) * perimeter(set) })
 }
 
 pub fn part2(input: String) -> Int {
-  let grid = input |> expand |> make_grid
-  let sets = find_groups(grid)
-
-  list.fold(sets, 0, fn(sum, set) { sum + { set.size(set) / 4 } * corners(set) })
+  input
+  |> expand
+  |> make_grid
+  |> find_groups
+  |> list.fold(0, fn(sum, set) { sum + { set.size(set) / 4 } * corners(set) })
 }
