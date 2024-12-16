@@ -4,6 +4,9 @@ import gleam/list
 import gleam/result
 import gleam/string
 
+type Expander =
+  fn(String) -> List(String)
+
 type Coord =
   #(Int, Int)
 
@@ -17,7 +20,7 @@ type Dir {
   Right
 }
 
-fn make_grid(str: String, f: fn(String) -> List(String)) -> Grid {
+fn make_grid(str: String, f: Expander) -> Grid {
   str
   |> str.lines
   |> list.index_map(fn(l, y) {
@@ -30,7 +33,7 @@ fn make_grid(str: String, f: fn(String) -> List(String)) -> Grid {
   |> dict.from_list
 }
 
-fn parse(input: String, f: fn(String) -> List(String)) -> #(Grid, List(Dir)) {
+fn parse(input: String, f: Expander) -> #(Grid, List(Dir)) {
   let assert Ok(#(a, b)) = string.split_once(input, "\n\n")
   let dirs =
     b
@@ -104,7 +107,7 @@ fn expand(c: String) -> List(String) {
   }
 }
 
-pub fn solve(input: String, block: String, f: fn(String) -> List(String)) -> Int {
+pub fn solve(input: String, block: String, f: Expander) -> Int {
   let #(grid, dirs) = parse(input, f)
   let robot = find_robot(grid)
   let #(grid, _) =
