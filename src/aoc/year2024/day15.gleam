@@ -71,24 +71,24 @@ fn next(grid: Grid, coord: Coord, dir: Dir) -> Result(#(Coord, String), Nil) {
 fn push(
   grid: Grid,
   coord: Coord,
-  v: String,
+  val: String,
   rep: String,
   dir: Dir,
 ) -> Result(Grid, Nil) {
   let grid = dict.insert(grid, coord, rep)
   use #(next_c, next_v) <- result.try(next(grid, coord, dir))
-  let grid = dict.insert(grid, next_c, v)
+  let grid = dict.insert(grid, next_c, val)
   case next_v {
     "." -> Ok(grid)
-    "O" -> push(grid, next_c, next_v, v, dir)
+    "O" -> push(grid, next_c, next_v, val, dir)
     "[" | "]" if dir == Left || dir == Right ->
-      push(grid, next_c, next_v, v, dir)
+      push(grid, next_c, next_v, val, dir)
     "[" -> {
-      use grid <- result.try(push(grid, next_c, next_v, v, dir))
+      use grid <- result.try(push(grid, next_c, next_v, val, dir))
       push(grid, #(next_c.0 + 1, next_c.1), "]", ".", dir)
     }
     "]" -> {
-      use grid <- result.try(push(grid, next_c, next_v, v, dir))
+      use grid <- result.try(push(grid, next_c, next_v, val, dir))
       push(grid, #(next_c.0 - 1, next_c.1), "[", ".", dir)
     }
     _ -> Error(Nil)
