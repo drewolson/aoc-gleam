@@ -1,7 +1,6 @@
 import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/order.{type Order}
 import gleam/result
@@ -55,7 +54,7 @@ fn order(a: Node, b: Node) -> Order {
 
 fn neighbors(
   coord: Coord,
-  seen: Set(Coord),
+  seen: Set(#(Coord, Dir)),
   grid: Grid,
   dir: Dir,
 ) -> List(#(Int, Coord, Dir)) {
@@ -85,7 +84,7 @@ fn neighbors(
 
   candidates
   |> list.filter(fn(node) {
-    !set.contains(seen, node.1)
+    !set.contains(seen, #(node.1, node.2))
     && case dict.get(grid, node.1) {
       Ok(v) -> v != "#"
       _ -> False
@@ -93,73 +92,82 @@ fn neighbors(
   })
 }
 
-fn all_paths(
+fn merge_nodes_aux(
   q: Queue(Node),
   goal: Coord,
+  dir: Dir,
   score: Int,
-  acc: List(#(Int, Set(Coord))),
-) -> List(#(Int, Set(Coord))) {
+  nonmatch: List(Node),
+  path: Set(Coord),
+) -> #(Queue(Node), Node) {
   case pq.pop(q) {
-    Ok(#(#(s, coord, _, path), q)) if s == score -> {
-      case coord == goal {
-        False -> all_paths(q, goal, score, acc)
-        True -> all_paths(q, goal, score, [#(s, path), ..acc])
+    Ok(#(#(s, coord, d, p) as node, q)) if s == score -> {
+      case coord == goal && d == dir {
+        False -> merge_nodes_aux(q, goal, dir, score, [node, ..nonmatch], path)
+        True ->
+          merge_nodes_aux(q, goal, dir, score, nonmatch, set.union(path, p))
       }
     }
-    _ -> acc
+    _ -> {
+      let q = list.fold(nonmatch, q, pq.push)
+      let node = #(score, goal, dir, path)
+      #(q, node)
+    }
   }
+}
+
+fn merge_nodes(
+  q: Queue(Node),
+  goal: Coord,
+  dir: Dir,
+  score: Int,
+) -> #(Queue(Node), Node) {
+  merge_nodes_aux(q, goal, dir, score, [], set.new())
 }
 
 fn search(
   q: Queue(Node),
-  seen: Set(Coord),
+  seen: Set(#(Coord, Dir)),
   grid: Grid,
   goal: Coord,
-) -> List(#(Int, Set(Coord))) {
+) -> #(Int, Set(Coord)) {
   case pq.pop(q) {
-    Error(_) -> []
-    Ok(#(#(score, coord, _, _), _)) if coord == goal ->
-      all_paths(q, goal, score, [])
-    Ok(#(#(score, coord, dir, path), q)) -> {
-      case set.contains(seen, coord) {
-        True -> search(q, seen, grid, goal)
+    Error(_) -> #(0, set.new())
+    Ok(#(#(score, coord, dir, _), _)) if coord == goal -> {
+      let #(_, node) = merge_nodes(q, coord, dir, score)
+      #(score, node.3)
+    }
+    Ok(#(#(score, coord, dir, _), nq)) -> {
+      case set.contains(seen, #(coord, dir)) {
+        True -> search(nq, seen, grid, goal)
         False -> {
-          let seen = set.insert(seen, coord)
-          coord
-          |> neighbors(seen, grid, dir)
+          let #(q, node) = merge_nodes(q, coord, dir, score)
+          let seen = set.insert(seen, #(coord, dir))
+          let #(_, coord, dir, path) = node
+          neighbors(coord, seen, grid, dir)
           |> list.map(fn(node) {
             #(node.0 + score, node.1, node.2, set.insert(path, node.1))
           })
-          |> list.fold(q, fn(q, node) { pq.push(q, node) })
-          |> search(set.insert(seen, coord), grid, goal)
+          |> list.fold(q, pq.push)
+          |> search(seen, grid, goal)
         }
       }
     }
   }
 }
 
-pub fn part1(input: String) -> Int {
+pub fn solve(input: String) -> #(Int, Set(Coord)) {
   let grid = make_grid(input)
   let start = find_coord(grid, "S")
   let goal = find_coord(grid, "E")
   let q = pq.from_list([#(0, start, East, set.from_list([start]))], order)
-  let assert Ok(#(score, _)) =
-    q
-    |> search(set.new(), grid, goal)
-    |> list.first
-  score
+  search(q, set.new(), grid, goal)
+}
+
+pub fn part1(input: String) -> Int {
+  solve(input).0
 }
 
 pub fn part2(input: String) -> Int {
-  let grid = make_grid(input)
-  let start = find_coord(grid, "S")
-  let goal = find_coord(grid, "E")
-  let q = pq.from_list([#(0, start, East, set.from_list([start]))], order)
-
-  q
-  |> search(set.new(), grid, goal)
-  |> io.debug
-  |> list.map(fn(p) { p.1 })
-  |> list.fold(set.new(), fn(acc, s) { set.union(acc, s) })
-  |> set.size
+  solve(input).1 |> set.size
 }
