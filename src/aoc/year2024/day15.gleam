@@ -124,7 +124,7 @@ pub fn solve(input: String, block: String, f: fn(String) -> List(String)) -> Int
 }
 
 pub fn part1(input: String) -> Int {
-  solve(input, "O", fn(c) { [c] })
+  solve(input, "O", list.wrap)
 }
 
 pub fn part2(input: String) -> Int {
