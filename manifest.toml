@@ -17,6 +17,7 @@ packages = [
   { name = "gleam_regexp", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_regexp", source = "hex", outer_checksum = "A3655FDD288571E90EE9C4009B719FEF59FA16AFCDF3952A76A125AF23CF1592" },
   { name = "gleam_stdlib", version = "0.47.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "3B22D46743C46498C8355365243327AC731ECD3959216344FA9CF9AD348620AC" },
   { name = "gleam_yielder", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleam_yielder", source = "hex", outer_checksum = "8E4E4ECFA7982859F430C57F549200C7749823C106759F4A19A78AEA6687717A" },
+  { name = "gleamy_structures", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleamy_structures", source = "hex", outer_checksum = "49C957ACF9857BC76FE13AB8D9C39FF3F5EF5DE9229DB0D15D228865C645DA66" },
   { name = "party", version = "1.0.6", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "party", source = "hex", outer_checksum = "E3B712048B10F843484567BA5B9C94828D8A0B8B7782C9219E0106C694AFA1A1" },
   { name = "prng", version = "4.0.0", build_tools = ["gleam"], requirements = ["gleam_bitwise", "gleam_stdlib", "gleam_yielder"], otp_app = "prng", source = "hex", outer_checksum = "E452F957D19CCDC1B4BD12AA6E1B33194B1EB9C2BC0B3449D96E3585602EE3AE" },
   { name = "qcheck", version = "0.0.7", build_tools = ["gleam"], requirements = ["exception", "gleam_regexp", "gleam_stdlib", "gleam_yielder", "prng"], otp_app = "qcheck", source = "hex", outer_checksum = "2363A970BB2E82623023154ED09EE48E3005229A869DA423B18468EA066A4CA9" },
@@ -32,6 +33,7 @@ gleam_deque = { version = ">= 1.0.0 and < 2.0.0" }
 gleam_regexp = { version = ">= 1.0.0 and < 2.0.0" }
 gleam_stdlib = { version = ">= 0.34.0 and < 2.0.0" }
 gleam_yielder = { version = ">= 1.0.0 and < 2.0.0" }
+gleamy_structures = { version = ">= 1.1.0 and < 2.0.0" }
 party = { version = ">= 1.0.4 and < 2.0.0" }
 qcheck = { version = ">= 0.0.6 and < 1.0.0" }
 simplifile = { version = ">= 2.2.0 and < 3.0.0" }
