@@ -82,8 +82,7 @@ fn neighbors(
     ]
   }
 
-  candidates
-  |> list.filter(fn(node) {
+  list.filter(candidates, fn(node) {
     !set.contains(seen, #(node.1, node.2))
     && case dict.get(grid, node.1) {
       Ok(v) -> v != "#"
