@@ -42,8 +42,7 @@ fn pow(a: Int, b: Int) -> Int {
   a
   |> int.power(int.to_float(b))
   |> result.unwrap(0.0)
-  |> float.floor
-  |> float.round
+  |> float.truncate
 }
 
 fn opcode(vm: Vm) -> Result(Int, Nil) {
@@ -54,13 +53,22 @@ fn operand(vm: Vm) -> Result(Int, Nil) {
   dict.get(vm.prog, vm.pos + 1)
 }
 
+fn dv(vm: Vm) -> Result(Int, Nil) {
+  use arg <- result.map(operand(vm))
+  vm.a / pow(2, combo(vm, arg))
+}
+
+fn mod(vm: Vm) -> Result(Int, Nil) {
+  use arg <- result.try(operand(vm))
+  arg |> combo(vm, _) |> int.modulo(8)
+}
+
 fn run(vm: Vm, output: List(Int)) -> List(Int) {
   let res = {
     use op <- result.try(opcode(vm))
     case op {
       0 -> {
-        use arg <- result.map(operand(vm))
-        let res = vm.a / pow(2, combo(vm, arg))
+        use res <- result.map(dv(vm))
         #(Vm(..vm, a: res, pos: vm.pos + 2), output)
       }
       1 -> {
@@ -69,8 +77,7 @@ fn run(vm: Vm, output: List(Int)) -> List(Int) {
         #(Vm(..vm, b: res, pos: vm.pos + 2), output)
       }
       2 -> {
-        use arg <- result.map(operand(vm))
-        let res = arg |> combo(vm, _) |> int.modulo(8) |> result.unwrap(0)
+        use res <- result.map(mod(vm))
         #(Vm(..vm, b: res, pos: vm.pos + 2), output)
       }
       3 -> {
@@ -87,18 +94,15 @@ fn run(vm: Vm, output: List(Int)) -> List(Int) {
         Ok(#(Vm(..vm, b: res, pos: vm.pos + 2), output))
       }
       5 -> {
-        use arg <- result.map(operand(vm))
-        let res = arg |> combo(vm, _) |> int.modulo(8) |> result.unwrap(0)
+        use res <- result.map(mod(vm))
         #(Vm(..vm, pos: vm.pos + 2), [res, ..output])
       }
       6 -> {
-        use arg <- result.map(operand(vm))
-        let res = vm.a / pow(2, combo(vm, arg))
+        use res <- result.map(dv(vm))
         #(Vm(..vm, b: res, pos: vm.pos + 2), output)
       }
       _ -> {
-        use arg <- result.map(operand(vm))
-        let res = vm.a / pow(2, combo(vm, arg))
+        use res <- result.map(dv(vm))
         #(Vm(..vm, c: res, pos: vm.pos + 2), output)
       }
     }
@@ -124,7 +128,8 @@ fn search(vm: Vm, n: Int, d: Int, goal: List(Int)) -> Int {
         |> ints
         |> yielder.find(fn(i) {
           let actual =
-            run(Vm(..vm, a: i), [])
+            Vm(..vm, a: i)
+            |> run([])
             |> list.reverse
             |> list.take(d)
 
