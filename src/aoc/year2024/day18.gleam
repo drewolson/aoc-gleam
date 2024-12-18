@@ -19,9 +19,7 @@ type Node =
   #(Int, Coord)
 
 fn order(a: Node, b: Node) -> Order {
-  let #(a_score, _) = a
-  let #(b_score, _) = b
-  int.compare(a_score, b_score)
+  int.compare(a.0, b.0)
 }
 
 fn make_grid(size: Int, bytes: List(Coord)) -> Grid {
@@ -54,30 +52,31 @@ fn neighbors(grid: Grid, coord: Coord) -> List(Coord) {
   |> list.filter(fn(c) { dict.get(grid, c) == Ok(".") })
 }
 
-fn steps(grid: Grid, q: Queue(Node), goal: Coord, seen: Set(Coord)) -> Int {
-  case pq.pop(q) {
-    Error(_) -> -1
-    Ok(#(#(score, coord), _)) if coord == goal -> score
-    Ok(#(node, q)) -> {
-      let #(score, coord) = node
-      case set.contains(seen, coord) {
-        True -> steps(grid, q, goal, seen)
-        False -> {
-          let seen = set.insert(seen, coord)
-          let q =
-            grid
-            |> neighbors(coord)
-            |> list.filter_map(fn(c) {
-              case set.contains(seen, c) {
-                True -> Error(Nil)
-                False -> Ok(#(score + 1, c))
-              }
-            })
-            |> list.fold(q, pq.push)
+fn steps(
+  grid: Grid,
+  q: Queue(Node),
+  goal: Coord,
+  seen: Set(Coord),
+) -> Result(Int, Nil) {
+  use #(#(score, coord), q) <- result.try(pq.pop(q))
 
-          steps(grid, q, goal, seen)
-        }
-      }
+  case coord == goal, set.contains(seen, coord) {
+    True, _ -> Ok(score)
+    False, True -> steps(grid, q, goal, seen)
+    False, False -> {
+      let seen = set.insert(seen, coord)
+      let q =
+        grid
+        |> neighbors(coord)
+        |> list.filter_map(fn(c) {
+          case set.contains(seen, c) {
+            True -> Error(Nil)
+            False -> Ok(#(score + 1, c))
+          }
+        })
+        |> list.fold(q, pq.push)
+
+      steps(grid, q, goal, seen)
     }
   }
 }
@@ -98,7 +97,9 @@ pub fn part1(input: String, size: Int, n: Int) -> Int {
   let grid = make_grid(size, bytes)
   let q = pq.from_list([#(0, #(0, 0))], order)
 
-  steps(grid, q, #(size, size), set.new())
+  grid
+  |> steps(q, #(size, size), set.new())
+  |> result.unwrap(-1)
 }
 
 pub fn part2(input: String, size: Int) -> String {
@@ -112,7 +113,7 @@ pub fn part2(input: String, size: Int) -> String {
   |> yielder.find_map(fn(p) {
     let #(#(x, y), grid) = p
     case steps(grid, q, goal, set.new()) {
-      -1 -> Ok(int.to_string(x) <> "," <> int.to_string(y))
+      Error(Nil) -> Ok(int.to_string(x) <> "," <> int.to_string(y))
       _ -> Error(Nil)
     }
   })
