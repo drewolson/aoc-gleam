@@ -46,10 +46,12 @@ fn input_p() -> Parser(List(Coord)) {
   party.sep1(coord_p(), party.string("\n"))
 }
 
-fn neighbors(grid: Grid, coord: Coord) -> List(Coord) {
+fn neighbors(grid: Grid, seen: Set(Coord), coord: Coord) -> List(Coord) {
   let #(x, y) = coord
   [#(x + 1, y), #(x - 1, y), #(x, y + 1), #(x, y - 1)]
-  |> list.filter(fn(c) { dict.get(grid, c) == Ok(".") })
+  |> list.filter(fn(c) {
+    dict.get(grid, c) == Ok(".") && !set.contains(seen, c)
+  })
 }
 
 fn steps(
@@ -67,13 +69,8 @@ fn steps(
       let seen = set.insert(seen, coord)
       let q =
         grid
-        |> neighbors(coord)
-        |> list.filter_map(fn(c) {
-          case set.contains(seen, c) {
-            True -> Error(Nil)
-            False -> Ok(#(score + 1, c))
-          }
-        })
+        |> neighbors(seen, coord)
+        |> list.map(fn(c) { #(score + 1, c) })
         |> list.fold(q, pq.push)
 
       steps(grid, q, goal, seen)
