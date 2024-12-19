@@ -1,11 +1,8 @@
-import aoc/util/state.{type State}
-import gleam/dict.{type Dict}
+import aoc/util/cache.{type Cache}
+import aoc/util/state
 import gleam/int
 import gleam/list
 import gleam/string
-
-type Cache(a) =
-  State(Dict(String, a), a)
 
 fn parse(input: String) -> #(List(String), List(String)) {
   let order = fn(a, b) { int.compare(string.length(b), string.length(a)) }
@@ -20,20 +17,8 @@ fn parse(input: String) -> #(List(String), List(String)) {
   #(patterns, designs)
 }
 
-fn do_cached(key: String, f: fn() -> Cache(Int)) -> Cache(Int) {
-  use res <- state.do(state.gets(dict.get(_, key)))
-  case res {
-    Ok(v) -> state.return(v)
-    Error(_) -> {
-      use v <- state.do(f())
-      use _ <- state.do(state.modify(dict.insert(_, key, v)))
-      state.return(v)
-    }
-  }
-}
-
-fn valid_combos(design: String, patterns: List(String)) -> Cache(Int) {
-  do_cached(design, fn() {
+fn valid_combos(design: String, patterns: List(String)) -> Cache(String, Int) {
+  cache.do_cached(design, fn() {
     case string.is_empty(design) {
       True -> state.return(1)
       False -> {
@@ -67,7 +52,7 @@ pub fn part1(input: String) -> Int {
       False -> acc
     })
   })
-  |> state.eval(dict.new())
+  |> cache.run
 }
 
 pub fn part2(input: String) -> Int {
@@ -79,5 +64,5 @@ pub fn part2(input: String) -> Int {
     use res <- state.do(valid_combos(design, patterns))
     state.return(acc + res)
   })
-  |> state.eval(dict.new())
+  |> cache.run
 }
