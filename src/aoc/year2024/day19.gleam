@@ -21,7 +21,7 @@ fn valid_combos(design: String, patterns: List(String)) -> Cache(String, Int) {
       False -> {
         list.fold(patterns, state.return(0), fn(sacc, pattern) {
           use acc <- state.do(sacc)
-          use res <- state.do(case string.starts_with(design, pattern) {
+          use res <- state.map(case string.starts_with(design, pattern) {
             False -> state.return(0)
             True ->
               valid_combos(
@@ -30,7 +30,7 @@ fn valid_combos(design: String, patterns: List(String)) -> Cache(String, Int) {
               )
           })
 
-          state.return(acc + res)
+          acc + res
         })
       }
     }
@@ -43,11 +43,11 @@ pub fn part1(input: String) -> Int {
   designs
   |> list.fold(state.return(0), fn(sacc, design) {
     use acc <- state.do(sacc)
-    use res <- state.do(valid_combos(design, patterns))
-    state.return(case res > 0 {
+    use res <- state.map(valid_combos(design, patterns))
+    case res > 0 {
       True -> acc + 1
       False -> acc
-    })
+    }
   })
   |> cache.run
 }
@@ -58,8 +58,8 @@ pub fn part2(input: String) -> Int {
   designs
   |> list.fold(state.return(0), fn(sacc, design) {
     use acc <- state.do(sacc)
-    use res <- state.do(valid_combos(design, patterns))
-    state.return(acc + res)
+    use res <- state.map(valid_combos(design, patterns))
+    acc + res
   })
   |> cache.run
 }
