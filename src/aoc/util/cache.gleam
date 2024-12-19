@@ -4,7 +4,7 @@ import gleam/dict.{type Dict}
 pub type Cache(k, v) =
   State(Dict(k, v), v)
 
-pub fn do_cached(key: k, f: fn() -> Cache(k, v)) -> Cache(k, v) {
+pub fn get_or(key: k, f: fn() -> Cache(k, v)) -> Cache(k, v) {
   use res <- state.do(state.gets(dict.get(_, key)))
   case res {
     Ok(value) -> state.return(value)

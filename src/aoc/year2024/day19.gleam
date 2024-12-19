@@ -15,7 +15,7 @@ fn parse(input: String) -> #(List(String), List(String)) {
 }
 
 fn valid_combos(design: String, patterns: List(String)) -> Cache(String, Int) {
-  cache.do_cached(design, fn() {
+  cache.get_or(design, fn() {
     case string.is_empty(design) {
       True -> state.return(1)
       False -> {
