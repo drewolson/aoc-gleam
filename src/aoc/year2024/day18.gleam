@@ -24,9 +24,11 @@ fn order(a: Node, b: Node) -> Order {
 
 fn make_grid(size: Int, bytes: List(Coord)) -> Grid {
   let grid =
-    list.range(0, size)
+    0
+    |> list.range(size)
     |> list.flat_map(fn(x) {
-      list.range(0, size)
+      0
+      |> list.range(size)
       |> list.map(fn(y) { #(#(x, y), ".") })
     })
     |> dict.from_list
