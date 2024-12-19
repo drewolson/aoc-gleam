@@ -1,17 +1,14 @@
 import aoc/util/cache.{type Cache}
 import aoc/util/state
-import gleam/int
 import gleam/list
 import gleam/string
 
 fn parse(input: String) -> #(List(String), List(String)) {
-  let order = fn(a, b) { int.compare(string.length(b), string.length(a)) }
   let assert Ok(#(a, b)) =
     input
     |> string.trim_end
     |> string.split_once("\n\n")
-
-  let patterns = a |> string.split(", ") |> list.sort(order)
+  let patterns = string.split(a, ", ")
   let designs = string.split(b, "\n")
 
   #(patterns, designs)
