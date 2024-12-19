@@ -32,7 +32,7 @@ fn do_cached(key: String, f: fn() -> Cache(Int)) -> Cache(Int) {
   }
 }
 
-fn is_valid(design: String, patterns: List(String)) -> Cache(Int) {
+fn valid_combos(design: String, patterns: List(String)) -> Cache(Int) {
   do_cached(design, fn() {
     case string.is_empty(design) {
       True -> state.return(1)
@@ -42,7 +42,7 @@ fn is_valid(design: String, patterns: List(String)) -> Cache(Int) {
           use res <- state.do(case string.starts_with(design, pattern) {
             False -> state.return(0)
             True ->
-              is_valid(
+              valid_combos(
                 string.drop_start(design, string.length(pattern)),
                 patterns,
               )
@@ -61,7 +61,7 @@ pub fn part1(input: String) -> Int {
   designs
   |> list.fold(state.return(0), fn(sacc, design) {
     use acc <- state.do(sacc)
-    use res <- state.do(is_valid(design, patterns))
+    use res <- state.do(valid_combos(design, patterns))
     state.return(case res > 0 {
       True -> acc + 1
       False -> acc
@@ -76,7 +76,7 @@ pub fn part2(input: String) -> Int {
   designs
   |> list.fold(state.return(0), fn(sacc, design) {
     use acc <- state.do(sacc)
-    use res <- state.do(is_valid(design, patterns))
+    use res <- state.do(valid_combos(design, patterns))
     state.return(acc + res)
   })
   |> state.eval(dict.new())
