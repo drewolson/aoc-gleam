@@ -1,5 +1,5 @@
 import aoc/year2024/day02
-import glacier/should
+import gleeunit/should
 
 const input = "7 6 4 2 1
 1 2 7 8 9

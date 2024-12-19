@@ -1,5 +1,5 @@
 import aoc/year2024/day17
-import glacier/should
+import gleeunit/should
 
 const input = "Register A: 729
 Register B: 0
