@@ -1,12 +1,9 @@
-import aoc/util/state.{type State}
+import aoc/util/cache.{type Cache}
+import aoc/util/state
 import aoc/util/str
-import gleam/dict.{type Dict}
 import gleam/int
 import gleam/list
 import gleam/result
-
-type Cache =
-  Dict(#(Int, Int), Int)
 
 fn split(stone: Int) -> List(Int) {
   let ds = int.digits(stone, 10) |> result.unwrap([])
@@ -24,24 +21,19 @@ fn split(stone: Int) -> List(Int) {
   }
 }
 
-fn expand(stone: Int, n: Int) -> State(Cache, Int) {
-  use res <- state.do(state.gets(dict.get(_, #(stone, n))))
+fn expand(stone: Int, n: Int) -> Cache(#(Int, Int), Int) {
+  use <- cache.get_or(#(stone, n))
 
-  case res, n {
-    Ok(n), _ -> state.return(n)
-    _, 0 -> state.return(1)
-    _, _ -> {
-      use val <- state.do(
-        stone
-        |> split
-        |> list.fold(state.return(0), fn(ssum, s) {
-          use sum <- state.do(ssum)
-          use next <- state.do(expand(s, n - 1))
-          state.return(sum + next)
-        }),
-      )
-      use _ <- state.do(state.modify(dict.insert(_, #(stone, n), val)))
-      state.return(val)
+  case n {
+    0 -> state.return(1)
+    _ -> {
+      stone
+      |> split
+      |> list.fold(state.return(0), fn(ssum, s) {
+        use sum <- state.do(ssum)
+        use next <- state.do(expand(s, n - 1))
+        state.return(sum + next)
+      })
     }
   }
 }
@@ -53,7 +45,7 @@ fn blink(stones: List(Int), n: Int) -> Int {
     use next <- state.do(expand(stone, n))
     state.return(sum + next)
   })
-  |> state.eval(dict.new())
+  |> cache.run
 }
 
 pub fn part1(input: String) -> Int {

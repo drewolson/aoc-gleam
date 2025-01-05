@@ -6,6 +6,7 @@ pub type Cache(k, v) =
 
 pub fn get_or(key: k, f: fn() -> Cache(k, v)) -> Cache(k, v) {
   use res <- state.do(state.gets(dict.get(_, key)))
+
   case res {
     Ok(value) -> state.return(value)
     Error(_) -> {
