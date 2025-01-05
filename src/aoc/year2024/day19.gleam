@@ -15,26 +15,26 @@ fn parse(input: String) -> #(List(String), List(String)) {
 }
 
 fn valid_combos(design: String, patterns: List(String)) -> Cache(String, Int) {
-  cache.get_or(design, fn() {
-    case string.is_empty(design) {
-      True -> state.return(1)
-      False -> {
-        list.fold(patterns, state.return(0), fn(sacc, pattern) {
-          use acc <- state.do(sacc)
-          use res <- state.map(case string.starts_with(design, pattern) {
-            False -> state.return(0)
-            True ->
-              valid_combos(
-                string.drop_start(design, string.length(pattern)),
-                patterns,
-              )
-          })
+  use <- cache.get_or(design)
 
-          acc + res
+  case string.is_empty(design) {
+    True -> state.return(1)
+    False -> {
+      list.fold(patterns, state.return(0), fn(sacc, pattern) {
+        use acc <- state.do(sacc)
+        use res <- state.map(case string.starts_with(design, pattern) {
+          False -> state.return(0)
+          True ->
+            valid_combos(
+              string.drop_start(design, string.length(pattern)),
+              patterns,
+            )
         })
-      }
+
+        acc + res
+      })
     }
-  })
+  }
 }
 
 pub fn part1(input: String) -> Int {
