@@ -17,7 +17,7 @@ pub fn fix_test() {
       }
     })
 
-  use n <- qcheck.given(qcheck.small_positive_or_zero_int())
+  use n <- qcheck.given(qcheck.int_small_positive_or_zero())
 
   fact_fix(n) == fact_regular(n)
 }

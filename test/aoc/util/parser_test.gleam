@@ -4,7 +4,7 @@ import party
 import qcheck
 
 pub fn int_test() {
-  use n <- qcheck.given(qcheck.small_positive_or_zero_int())
+  use n <- qcheck.given(qcheck.int_small_positive_or_zero())
 
   let result =
     n
@@ -15,7 +15,7 @@ pub fn int_test() {
 }
 
 pub fn signed_int_positive_test() {
-  use n <- qcheck.given(qcheck.small_positive_or_zero_int())
+  use n <- qcheck.given(qcheck.int_small_positive_or_zero())
 
   let input = "+" <> int.to_string(n)
   let result = party.go(parser.signed_int(), input)
@@ -24,7 +24,7 @@ pub fn signed_int_positive_test() {
 }
 
 pub fn signed_int_negative_test() {
-  use n <- qcheck.given(qcheck.small_positive_or_zero_int())
+  use n <- qcheck.given(qcheck.int_small_positive_or_zero())
 
   let input = "-" <> int.to_string(n)
   let result = party.go(parser.signed_int(), input)
