@@ -4,7 +4,7 @@ import aoc/year2023/day09
 import aoc/year2023/day14
 import gleam/string
 
-pub fn run(input: String, day: Int, part: Int) {
+pub fn run(input: String, day: Int, part: Int) -> String {
   case day, part {
     1, 1 -> input |> day01.part1 |> string.inspect
     1, 2 -> input |> day01.part2 |> string.inspect

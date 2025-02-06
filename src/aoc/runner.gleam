@@ -4,7 +4,7 @@ import gleam/result
 import gleam/string
 import simplifile
 
-pub fn run(year: Int, day: Int, part: Int) {
+pub fn run(year: Int, day: Int, part: Int) -> Result(String, String) {
   let year_str = string.inspect(year)
   let day_str = day |> string.inspect |> string.pad_start(2, "0")
   let path = "./data/" <> year_str <> "/day" <> day_str <> ".txt"

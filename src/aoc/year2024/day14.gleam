@@ -109,8 +109,7 @@ fn flood(unseen: Set(Pair), curr: Set(Pair), seen: Set(Pair)) -> Set(Pair) {
 fn find_groups(robots: List(Robot)) -> List(Set(Pair)) {
   let coords = robots |> list.map(fn(p) { p.0 }) |> set.from_list
   let #(_, sets) =
-    coords
-    |> set.fold(#(set.new(), []), fn(acc, coord) {
+    set.fold(coords, #(set.new(), []), fn(acc, coord) {
       let #(seen, sets) = acc
       case set.contains(seen, coord) {
         True -> #(seen, sets)

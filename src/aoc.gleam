@@ -1,18 +1,18 @@
 import aoc/runner
 import argv
-import clip
+import clip.{type Command}
 import clip/help
-import clip/opt
+import clip/opt.{type Opt}
 import gleam/io
 import gleam/result
-import gleam/set
+import gleam/set.{type Set}
 import gleam/string
 
-fn valid_years() {
+fn valid_years() -> Set(Int) {
   set.from_list([2023, 2024])
 }
 
-fn day_opt() {
+fn day_opt() -> Opt(Int) {
   opt.new("day")
   |> opt.short("d")
   |> opt.help("Day to run")
@@ -25,7 +25,7 @@ fn day_opt() {
   })
 }
 
-fn part_opt() {
+fn part_opt() -> Opt(Int) {
   opt.new("part")
   |> opt.short("p")
   |> opt.help("Part to run")
@@ -38,7 +38,7 @@ fn part_opt() {
   })
 }
 
-fn year_opt() {
+fn year_opt() -> Opt(Int) {
   opt.new("year")
   |> opt.short("y")
   |> opt.help("Year to run")
@@ -54,7 +54,7 @@ fn year_opt() {
   |> opt.default(2024)
 }
 
-fn command() {
+fn command() -> Command(Result(String, String)) {
   clip.command({
     use year <- clip.parameter
     use day <- clip.parameter
@@ -67,11 +67,11 @@ fn command() {
   |> clip.opt(part_opt())
 }
 
-pub fn main() {
+pub fn main() -> Nil {
   command()
   |> clip.help(help.simple("aoc", "run aoc solution"))
   |> clip.run(argv.load().arguments)
   |> result.flatten
-  |> result.map(io.println)
-  |> result.map_error(io.println_error)
+  |> result.unwrap_both
+  |> io.println
 }
