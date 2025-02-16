@@ -1,3 +1,5 @@
+import gleam/list
+
 pub opaque type State(s, a) {
   State(f: fn(s) -> #(a, s))
 }
@@ -46,6 +48,13 @@ pub fn map(state: State(s, a), f: fn(a) -> b) -> State(s, b) {
   use a <- do(state)
 
   return(f(a))
+}
+
+pub fn fold(l: List(a), init: b, f: fn(b, a) -> State(s, b)) -> State(s, b) {
+  list.fold(l, return(init), fn(sb, a) {
+    use b <- do(sb)
+    f(b, a)
+  })
 }
 
 pub fn apply(sf: State(s, fn(a) -> b), sa: State(s, a)) -> State(s, b) {

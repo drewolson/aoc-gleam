@@ -1,6 +1,5 @@
 import aoc/util/cache.{type Cache}
 import aoc/util/state
-import gleam/list
 import gleam/string
 
 fn parse(input: String) -> #(List(String), List(String)) {
@@ -20,8 +19,7 @@ fn valid_combos(design: String, patterns: List(String)) -> Cache(String, Int) {
   case string.is_empty(design) {
     True -> state.return(1)
     False -> {
-      list.fold(patterns, state.return(0), fn(sacc, pattern) {
-        use acc <- state.do(sacc)
+      state.fold(patterns, 0, fn(acc, pattern) {
         use res <- state.map(case string.starts_with(design, pattern) {
           False -> state.return(0)
           True ->
@@ -41,8 +39,7 @@ pub fn part1(input: String) -> Int {
   let #(patterns, designs) = parse(input)
 
   designs
-  |> list.fold(state.return(0), fn(sacc, design) {
-    use acc <- state.do(sacc)
+  |> state.fold(0, fn(acc, design) {
     use res <- state.map(valid_combos(design, patterns))
     case res > 0 {
       True -> acc + 1
@@ -56,8 +53,7 @@ pub fn part2(input: String) -> Int {
   let #(patterns, designs) = parse(input)
 
   designs
-  |> list.fold(state.return(0), fn(sacc, design) {
-    use acc <- state.do(sacc)
+  |> state.fold(0, fn(acc, design) {
     use res <- state.map(valid_combos(design, patterns))
     acc + res
   })
