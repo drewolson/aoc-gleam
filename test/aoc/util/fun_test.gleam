@@ -1,4 +1,5 @@
 import aoc/util/fun
+import gleeunit/should
 import qcheck
 
 fn fact_regular(n) {
@@ -17,7 +18,8 @@ pub fn fix_test() {
       }
     })
 
-  use n <- qcheck.given(qcheck.int_small_positive_or_zero())
+  use n <- qcheck.given(qcheck.small_non_negative_int())
 
-  fact_fix(n) == fact_regular(n)
+  fact_fix(n)
+  |> should.equal(fact_regular(n))
 }
