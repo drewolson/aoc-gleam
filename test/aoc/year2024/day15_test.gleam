@@ -1,5 +1,4 @@
 import aoc/year2024/day15
-import gleeunit/should
 
 const input1 = "########
 #..O.O.#
@@ -36,17 +35,11 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 "
 
 pub fn part1_test() {
-  input1
-  |> day15.part1
-  |> should.equal(2028)
+  assert day15.part1(input1) == 2028
 
-  input2
-  |> day15.part1
-  |> should.equal(10_092)
+  assert day15.part1(input2) == 10_092
 }
 
 pub fn part2_test() {
-  input2
-  |> day15.part2
-  |> should.equal(9021)
+  assert day15.part2(input2) == 9021
 }

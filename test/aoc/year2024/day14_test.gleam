@@ -1,5 +1,4 @@
 import aoc/year2024/day14
-import gleeunit/should
 
 const input = "p=0,4 v=3,-3
 p=6,3 v=-1,-3
@@ -16,7 +15,5 @@ p=9,5 v=-3,-3
 "
 
 pub fn part1_test() {
-  input
-  |> day14.part1(11, 7)
-  |> should.equal(12)
+  assert day14.part1(input, 11, 7) == 12
 }

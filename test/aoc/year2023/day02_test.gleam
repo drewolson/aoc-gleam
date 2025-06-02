@@ -1,5 +1,4 @@
 import aoc/year2023/day02
-import gleeunit/should
 
 const input = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
@@ -9,13 +8,9 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
 "
 
 pub fn part1_test() {
-  input
-  |> day02.part1
-  |> should.equal(8)
+  assert day02.part1(input) == 8
 }
 
 pub fn part2_test() {
-  input
-  |> day02.part2
-  |> should.equal(2286)
+  assert day02.part2(input) == 2286
 }

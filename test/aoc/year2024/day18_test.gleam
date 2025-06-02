@@ -1,5 +1,4 @@
 import aoc/year2024/day18
-import gleeunit/should
 
 const input = "5,4
 4,2
@@ -29,13 +28,9 @@ const input = "5,4
 "
 
 pub fn part1_test() {
-  input
-  |> day18.part1(6, 12)
-  |> should.equal(22)
+  assert day18.part1(input, 6, 12) == 22
 }
 
 pub fn part2_test() {
-  input
-  |> day18.part2(6)
-  |> should.equal("6,1")
+  assert day18.part2(input, 6) == "6,1"
 }

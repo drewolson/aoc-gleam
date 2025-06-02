@@ -1,5 +1,4 @@
 import aoc/year2024/day13
-import gleeunit/should
 
 const input = "Button A: X+94, Y+34
 Button B: X+22, Y+67
@@ -19,7 +18,5 @@ Prize: X=18641, Y=10279
 "
 
 pub fn part1_test() {
-  input
-  |> day13.part1
-  |> should.equal(480)
+  assert day13.part1(input) == 480
 }

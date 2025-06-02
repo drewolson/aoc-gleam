@@ -1,5 +1,4 @@
 import aoc/year2024/day17
-import gleeunit/should
 
 const input = "Register A: 729
 Register B: 0
@@ -30,21 +29,13 @@ Program: 0,3,5,4,3,0
 "
 
 pub fn part1_test() {
-  input
-  |> day17.part1
-  |> should.equal("4,6,3,5,6,3,5,2,1,0")
+  assert day17.part1(input) == "4,6,3,5,6,3,5,2,1,0"
 
-  input1
-  |> day17.part1
-  |> should.equal("0,1,2")
+  assert day17.part1(input1) == "0,1,2"
 
-  input2
-  |> day17.part1
-  |> should.equal("4,2,5,6,7,7,7,7,3,1,0")
+  assert day17.part1(input2) == "4,2,5,6,7,7,7,7,3,1,0"
 }
 
 pub fn part2_test() {
-  input3
-  |> day17.part2
-  |> should.equal(117_440)
+  assert day17.part2(input3) == 117_440
 }

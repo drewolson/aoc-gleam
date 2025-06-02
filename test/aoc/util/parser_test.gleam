@@ -1,6 +1,5 @@
 import aoc/util/parser
 import gleam/int
-import gleeunit/should
 import party
 import qcheck
 
@@ -12,8 +11,7 @@ pub fn int_test() {
     |> int.to_string
     |> party.go(parser.int(), _)
 
-  result
-  |> should.equal(Ok(n))
+  assert result == Ok(n)
 }
 
 pub fn signed_int_positive_test() {
@@ -22,8 +20,7 @@ pub fn signed_int_positive_test() {
   let input = "+" <> int.to_string(n)
   let result = party.go(parser.signed_int(), input)
 
-  result
-  |> should.equal(Ok(n))
+  assert result == Ok(n)
 }
 
 pub fn signed_int_negative_test() {
@@ -32,6 +29,5 @@ pub fn signed_int_negative_test() {
   let input = "-" <> int.to_string(n)
   let result = party.go(parser.signed_int(), input)
 
-  result
-  |> should.equal(Ok(-n))
+  assert result == Ok(-n)
 }
