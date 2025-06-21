@@ -45,10 +45,14 @@ fn year_opt() -> Opt(Int) {
   |> opt.int
   |> opt.try_map(fn(year) {
     let years = valid_years()
-    let years_str = years |> set.to_list |> string.inspect
+
     case set.contains(years, year) {
       True -> Ok(year)
-      False -> Error("Year must be in " <> years_str)
+      False -> {
+        let years_str = years |> set.to_list |> string.inspect
+
+        Error("Year must be in " <> years_str)
+      }
     }
   })
   |> opt.default(2024)
