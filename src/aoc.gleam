@@ -9,7 +9,7 @@ import gleam/set.{type Set}
 import gleam/string
 
 fn valid_years() -> Set(Int) {
-  set.from_list([2023, 2024])
+  set.from_list([2019, 2023, 2024])
 }
 
 fn day_opt() -> Opt(Int) {
