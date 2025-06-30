@@ -1,42 +1,28 @@
+import aoc/year2019/int_code.{type IntCode, type Step, Continue, Stop}
 import gleam/int
 import gleam/list
-import gleam/result
 import gleam/string
 import gleam/yielder
-import iv.{type Array}
+import iv
 
-fn bin_op(
-  prog: Array(Int),
-  pos: Int,
-  op: fn(Int, Int) -> Int,
-  f: fn(Array(Int)) -> Result(a, Nil),
-) -> Result(a, Nil) {
-  use ia <- result.try(iv.get(prog, pos + 1))
-  use a <- result.try(iv.get(prog, ia))
-  use ib <- result.try(iv.get(prog, pos + 2))
-  use b <- result.try(iv.get(prog, ib))
-  use r <- result.try(iv.get(prog, pos + 3))
-  use new <- result.try(iv.set(prog, r, op(a, b)))
-
-  f(new)
-}
-
-fn execute(prog: Array(Int), pos: Int) -> Result(Int, Nil) {
-  use op <- result.try(iv.get(prog, pos))
-
+fn execute(ic: IntCode, op: Int) -> Step(IntCode, Int) {
   case op {
     1 -> {
-      use new <- bin_op(prog, pos, fn(a, b) { a + b })
+      let new = int_code.bin_op(ic, fn(a, b) { a + b })
 
-      execute(new, pos + 4)
+      Continue(new)
     }
     2 -> {
-      use new <- bin_op(prog, pos, fn(a, b) { a * b })
+      let new = int_code.bin_op(ic, fn(a, b) { a * b })
 
-      execute(new, pos + 4)
+      Continue(new)
     }
-    99 -> iv.get(prog, 0)
-    _ -> Error(Nil)
+    99 -> {
+      let val = int_code.get_output(ic)
+
+      Stop(val)
+    }
+    _ -> Continue(ic)
   }
 }
 
@@ -45,9 +31,8 @@ pub fn part1(input: String) -> Int {
   |> string.trim_end
   |> string.split(",")
   |> list.filter_map(int.parse)
-  |> iv.from_list
-  |> execute(0)
-  |> result.unwrap(-1)
+  |> int_code.from_list
+  |> int_code.execute(execute)
 }
 
 pub fn part2(input: String) -> Int {
@@ -66,9 +51,10 @@ pub fn part2(input: String) -> Int {
     })
     |> yielder.find(fn(p) {
       let #(a, b) = p
-      let new = prog |> iv.try_set(1, a) |> iv.try_set(2, b)
+      let new =
+        prog |> iv.try_set(1, a) |> iv.try_set(2, b) |> int_code.from_array
 
-      execute(new, 0) == Ok(19_690_720)
+      int_code.execute(new, execute) == 19_690_720
     })
 
   100 * a + b
