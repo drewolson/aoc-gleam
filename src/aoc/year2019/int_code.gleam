@@ -30,7 +30,7 @@ pub fn bin_op(ic: IntCode, op: fn(Int, Int) -> Int) -> IntCode {
   IntCode(prog: new_prog, pos: ic.pos + 4)
 }
 
-pub fn get_op(ic: IntCode) -> Int {
+pub fn get_current(ic: IntCode) -> Int {
   let assert Ok(val) = iv.get(ic.prog, ic.pos)
   val
 }
@@ -41,10 +41,9 @@ pub fn get_output(ic: IntCode) -> Int {
 }
 
 pub fn execute(ic: IntCode, f: fn(IntCode, Int) -> Step(IntCode, a)) -> a {
-  let op = get_op(ic)
-  let step = f(ic, op)
+  let op = get_current(ic)
 
-  case step {
+  case f(ic, op) {
     Continue(ic) -> execute(ic, f)
     Stop(a) -> a
   }
