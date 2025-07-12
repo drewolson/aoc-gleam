@@ -1,4 +1,5 @@
 import aoc/util/cache.{type Cache}
+import aoc/util/ints
 import aoc/util/state
 import aoc/util/str
 import gleam/int
@@ -6,7 +7,7 @@ import gleam/list
 import gleam/result
 
 fn split(stone: Int) -> List(Int) {
-  let ds = int.digits(stone, 10) |> result.unwrap([])
+  let ds = ints.digits(stone, 10) |> result.unwrap([])
   let l = list.length(ds)
 
   case stone, int.is_even(l) {
@@ -15,7 +16,7 @@ fn split(stone: Int) -> List(Int) {
       let #(a, b) = list.split(ds, l / 2)
       [a, b]
       |> list.map(fn(ns) { list.drop_while(ns, fn(d) { d == 0 }) })
-      |> list.filter_map(int.undigits(_, 10))
+      |> list.filter_map(ints.undigits(_, 10))
     }
     _, False -> [stone * 2024]
   }
