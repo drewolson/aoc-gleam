@@ -4,7 +4,6 @@ import clip.{type Command}
 import clip/help
 import clip/opt.{type Opt}
 import gleam/io
-import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 
@@ -58,7 +57,7 @@ fn year_opt() -> Opt(Int) {
   |> opt.default(2024)
 }
 
-fn command() -> Command(Result(String, String)) {
+fn command() -> Command(String) {
   clip.command({
     use year <- clip.parameter
     use day <- clip.parameter
@@ -72,10 +71,13 @@ fn command() -> Command(Result(String, String)) {
 }
 
 pub fn main() -> Nil {
-  command()
-  |> clip.help(help.simple("aoc", "run aoc solution"))
-  |> clip.run(argv.load().arguments)
-  |> result.flatten
-  |> result.unwrap_both
-  |> io.println
+  let result =
+    command()
+    |> clip.help(help.simple("aoc", "run aoc solution"))
+    |> clip.run(argv.load().arguments)
+
+  case result {
+    Ok(str) -> io.println(str)
+    Error(str) -> io.println_error(str)
+  }
 }
