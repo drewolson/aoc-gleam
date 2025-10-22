@@ -54,7 +54,7 @@ fn year_opt() -> Opt(Int) {
       }
     }
   })
-  |> opt.default(2024)
+  |> opt.default(2025)
 }
 
 fn command() -> Command(String) {
