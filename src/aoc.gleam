@@ -57,13 +57,13 @@ fn year_opt() -> Opt(Int) {
   |> opt.default(2025)
 }
 
-fn command() -> Command(String) {
+fn command() -> Command(#(Int, Int, Int)) {
   clip.command({
     use year <- clip.parameter
     use day <- clip.parameter
     use part <- clip.parameter
 
-    runner.run(year, day, part)
+    #(year, day, part)
   })
   |> clip.opt(year_opt())
   |> clip.opt(day_opt())
@@ -77,7 +77,9 @@ pub fn main() -> Nil {
     |> clip.run(argv.load().arguments)
 
   case result {
-    Ok(str) -> io.println(str)
     Error(str) -> io.println_error(str)
+    Ok(#(year, day, part)) ->
+      runner.run(year, day, part)
+      |> io.println
   }
 }
