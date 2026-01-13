@@ -58,13 +58,7 @@ fn year_opt() -> Opt(Int) {
 }
 
 fn command() -> Command(#(Int, Int, Int)) {
-  clip.command({
-    use year <- clip.parameter
-    use day <- clip.parameter
-    use part <- clip.parameter
-
-    #(year, day, part)
-  })
+  clip.command3()
   |> clip.opt(year_opt())
   |> clip.opt(day_opt())
   |> clip.opt(part_opt())
