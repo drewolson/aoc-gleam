@@ -1,3 +1,4 @@
+import aoc/util/li
 import aoc/util/parser.{type Parser}
 import gleam/dict.{type Dict}
 import gleam/int
@@ -25,10 +26,10 @@ fn order(a: Node, b: Node) -> Order {
 fn make_grid(size: Int, bytes: List(Coord)) -> Grid {
   let grid =
     0
-    |> list.range(size)
+    |> li.range(size)
     |> list.flat_map(fn(x) {
       0
-      |> list.range(size)
+      |> li.range(size)
       |> list.map(fn(y) { #(#(x, y), ".") })
     })
     |> dict.from_list

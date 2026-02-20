@@ -1,3 +1,4 @@
+import aoc/util/li
 import aoc/util/parser.{type Parser}
 import gleam/int
 import gleam/io
@@ -126,8 +127,8 @@ fn find_groups(robots: List(Robot)) -> List(Set(Pair)) {
 
 fn display(l: List(Robot), w: Int, h: Int) -> Nil {
   let s = l |> list.map(fn(r) { r.0 }) |> set.from_list
-  list.each(list.range(0, h - 1), fn(y) {
-    list.range(0, w - 1)
+  list.each(li.range(0, h - 1), fn(y) {
+    li.range(0, w - 1)
     |> list.map(fn(x) {
       case set.contains(s, #(x, y)) {
         False -> "."

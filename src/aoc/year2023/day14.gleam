@@ -55,7 +55,7 @@ fn load(l: List(String)) -> Int {
 }
 
 fn cycle(grid: Grid) -> Grid {
-  list.range(0, 3)
+  li.range(0, 3)
   |> list.fold(grid, fn(grid, _) { grid |> tilt |> rotate })
 }
 

@@ -1,3 +1,4 @@
+import aoc/util/li
 import aoc/util/str
 import gleam/dict.{type Dict}
 import gleam/list
@@ -30,7 +31,7 @@ fn find_keys(grid: Grid, val: String) -> List(Coord) {
 fn rays(grid: Grid, c: Coord) -> List(String) {
   let #(x, y) = c
 
-  list.range(1, 3)
+  li.range(1, 3)
   |> list.map(fn(i) {
     [
       #(x + i, y),
