@@ -4,7 +4,7 @@ version = "1.0.0"
 [dependencies]
 gleam_stdlib = ">= 0.34.0 and < 2.0.0"
 argv = ">= 1.0.2 and < 2.0.0"
-party = ">= 1.0.4 and < 2.0.0"
+party = { git = "https://github.com/RyanBrewer317/party", ref = "9f12b228bde0f24f3c7f3afb0ea9cacd53fc06b4" }
 clip = ">= 1.0.0 and < 2.0.0"
 simplifile = ">= 2.2.0 and < 3.0.0"
 gleam_regexp = ">= 1.0.0 and < 2.0.0"
