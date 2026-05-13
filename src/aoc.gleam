@@ -64,9 +64,6 @@ fn command() -> Command(#(Int, Int, Int)) {
   |> clip.opt(part_opt())
 }
 
-@external(erlang, "erlang", "halt")
-fn halt() -> Nil
-
 pub fn main() -> Nil {
   let result =
     command()
@@ -79,6 +76,4 @@ pub fn main() -> Nil {
       runner.run(year, day, part)
       |> io.println
   }
-
-  halt()
 }
