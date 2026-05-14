@@ -37,7 +37,11 @@ fn compress(d: Deque(Block)) -> Yielder(#(Int, Int)) {
   }
 }
 
-fn insert(d: Deque(Block), size: Int, content: Int) -> Result(Deque(Block), Nil) {
+fn insert(
+  d: Deque(Block),
+  size: Int,
+  content: Int,
+) -> Result(Deque(Block), Nil) {
   use #(b, d) <- result.try(deque.pop_front(d))
 
   case b {

@@ -71,7 +71,13 @@ fn next(acc: Set(Coord), grid: Grid, c: Coord, dx: Int, dy: Int) -> Set(Coord) {
   }
 }
 
-fn search(acc: Set(Coord), grid: Grid, c: Coord, dx: Int, dy: Int) -> Set(Coord) {
+fn search(
+  acc: Set(Coord),
+  grid: Grid,
+  c: Coord,
+  dx: Int,
+  dy: Int,
+) -> Set(Coord) {
   case dict.get(grid, c) {
     Error(_) -> acc
     Ok(_) -> search(set.insert(acc, c), grid, #(c.0 + dx, c.1 + dy), dx, dy)
