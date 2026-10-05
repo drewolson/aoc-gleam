@@ -1,6 +1,7 @@
 import aoc/year2024/day01
 
-const input = "3   4
+const input =
+  "3   4
 4   3
 2   5
 1   3

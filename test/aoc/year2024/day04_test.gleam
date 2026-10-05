@@ -1,6 +1,7 @@
 import aoc/year2024/day04
 
-const input = "MMMSXXMASM
+const input =
+  "MMMSXXMASM
 MSAMXMSMSA
 AMXSXMAAMM
 MSAMASMSMX

@@ -1,6 +1,7 @@
 import aoc/year2024/day05
 
-const input = "47|53
+const input =
+  "47|53
 97|13
 97|61
 97|47

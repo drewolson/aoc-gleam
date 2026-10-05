@@ -1,6 +1,7 @@
 import aoc/year2024/day13
 
-const input = "Button A: X+94, Y+34
+const input =
+  "Button A: X+94, Y+34
 Button B: X+22, Y+67
 Prize: X=8400, Y=5400
 

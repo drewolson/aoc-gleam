@@ -1,6 +1,7 @@
 import aoc/year2024/day19
 
-const input = "r, wr, b, g, bwu, rb, gb, br
+const input =
+  "r, wr, b, g, bwu, rb, gb, br
 
 brwrr
 bggr

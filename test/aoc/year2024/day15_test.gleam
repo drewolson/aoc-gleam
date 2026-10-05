@@ -1,6 +1,7 @@
 import aoc/year2024/day15
 
-const input1 = "########
+const input1 =
+  "########
 #..O.O.#
 ##@.O..#
 #...O..#
@@ -11,7 +12,8 @@ const input1 = "########
 
 <^^>>>vv<v>>v<<"
 
-const input2 = "##########
+const input2 =
+  "##########
 #..O..O.O#
 #......O.#
 #.OO..O.O#

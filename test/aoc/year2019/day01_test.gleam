@@ -1,12 +1,14 @@
 import aoc/year2019/day01
 
-const input = "12
+const input =
+  "12
 14
 1969
 100756
 "
 
-const input2 = "14
+const input2 =
+  "14
 1969
 100756
 "

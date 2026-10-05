@@ -1,6 +1,7 @@
 import aoc/year2024/day12
 
-const input = "RRRRIICCFF
+const input =
+  "RRRRIICCFF
 RRRRIICCCF
 VVRRRCCFFF
 VVRCCCJFFF

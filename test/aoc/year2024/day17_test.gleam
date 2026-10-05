@@ -1,27 +1,31 @@
 import aoc/year2024/day17
 
-const input = "Register A: 729
+const input =
+  "Register A: 729
 Register B: 0
 Register C: 0
 
 Program: 0,1,5,4,3,0
 "
 
-const input1 = "Register A: 10
+const input1 =
+  "Register A: 10
 Register B: 0
 Register C: 0
 
 Program: 5,0,5,1,5,4
 "
 
-const input2 = "Register A: 2024
+const input2 =
+  "Register A: 2024
 Register B: 0
 Register C: 0
 
 Program: 0,1,5,4,3,0
 "
 
-const input3 = "Register A: 2024
+const input3 =
+  "Register A: 2024
 Register B: 0
 Register C: 0
 
