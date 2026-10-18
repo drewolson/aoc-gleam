@@ -1,4 +1,4 @@
-import aoc/year2025/day01
+import aoc/year2026/day01
 
 const input =
   "a
