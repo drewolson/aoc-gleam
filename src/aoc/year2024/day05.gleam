@@ -18,9 +18,9 @@ type Reqs =
   Dict(Int, Set(Int))
 
 fn rule_p() -> Parser(Rule) {
-  use a <- combinators.then(parser.int())
+  use a <- combinators.then(chars.natural())
   use <- parser.drop(chars.string("|"))
-  use b <- combinators.map(parser.int())
+  use b <- combinators.map(chars.natural())
   #(a, b)
 }
 
@@ -29,7 +29,7 @@ fn rules_p() -> Parser(List(Rule)) {
 }
 
 fn update_p() -> Parser(Update) {
-  combinators.sep_by1(parser.int(), chars.string(","))
+  combinators.sep_by1(chars.natural(), chars.string(","))
 }
 
 fn updates_p() -> Parser(List(Update)) {

@@ -24,14 +24,14 @@ type Game {
 
 fn color_p() -> Parser(Color) {
   combinators.choice([
-    chars.string("red") |> parser.replace(Red),
-    chars.string("blue") |> parser.replace(Blue),
-    chars.string("green") |> parser.replace(Green),
+    chars.string("red") |> combinators.replace(Red),
+    chars.string("blue") |> combinators.replace(Blue),
+    chars.string("green") |> combinators.replace(Green),
   ])
 }
 
 fn draw_p() -> Parser(Draw) {
-  use n <- combinators.then(parser.int())
+  use n <- combinators.then(chars.natural())
   use <- parser.drop(chars.whitespace1())
   use color <- combinators.then(color_p())
 
@@ -44,7 +44,7 @@ fn round_p() -> Parser(Round) {
 
 fn game_p() -> Parser(Game) {
   use <- parser.drop(chars.string("Game "))
-  use n <- combinators.then(parser.int())
+  use n <- combinators.then(chars.natural())
   use <- parser.drop(chars.string(": "))
   use rounds <- combinators.then(combinators.sep_by1(
     round_p(),

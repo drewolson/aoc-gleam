@@ -39,9 +39,9 @@ fn make_grid(size: Int, bytes: List(Coord)) -> Grid {
 }
 
 fn coord_p() -> Parser(Coord) {
-  use a <- combinators.then(parser.int())
+  use a <- combinators.then(chars.natural())
   use <- parser.drop(chars.string(","))
-  use b <- combinators.map(parser.int())
+  use b <- combinators.map(chars.natural())
 
   #(a, b)
 }

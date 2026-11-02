@@ -11,11 +11,11 @@ type Config =
   #(Coord, Coord, Coord)
 
 fn coord_p(sep: String) -> Parser(Coord) {
-  combinators.succeed(fn(a) { fn(b) { #(a, b) } })
-  |> parser.skip(chars.string("X" <> sep))
-  |> parser.keep(parser.int())
-  |> parser.skip(chars.string(", Y" <> sep))
-  |> parser.keep(parser.int())
+  use <- parser.drop(chars.string("X" <> sep))
+  use a <- combinators.then(chars.natural())
+  use <- parser.drop(chars.string(", Y" <> sep))
+  use b <- combinators.map(chars.natural())
+  #(a, b)
 }
 
 fn button_p() -> Parser(Coord) {
@@ -27,13 +27,13 @@ fn prize_p() -> Parser(Coord) {
 }
 
 fn config_p() -> Parser(Config) {
-  combinators.succeed(fn(a) { fn(b) { fn(c) { #(a, b, c) } } })
-  |> parser.skip(chars.string("Button A: "))
-  |> parser.keep(button_p())
-  |> parser.skip(chars.string("\nButton B: "))
-  |> parser.keep(button_p())
-  |> parser.skip(chars.string("\nPrize: "))
-  |> parser.keep(prize_p())
+  use <- parser.drop(chars.string("Button A: "))
+  use a <- combinators.then(button_p())
+  use <- parser.drop(chars.string("\nButton B: "))
+  use b <- combinators.then(button_p())
+  use <- parser.drop(chars.string("\nPrize: "))
+  use c <- combinators.map(prize_p())
+  #(a, b, c)
 }
 
 fn configs_p() -> Parser(List(Config)) {

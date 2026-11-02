@@ -24,11 +24,11 @@ fn pair_p() -> Parser(#(Int, Int)) {
 }
 
 fn robot_p() -> Parser(Robot) {
-  combinators.succeed(fn(p) { fn(v) { #(p, v) } })
-  |> parser.skip(chars.string("p="))
-  |> parser.keep(pair_p())
-  |> parser.skip(chars.string(" v="))
-  |> parser.keep(pair_p())
+  use <- parser.drop(chars.string("p="))
+  use p <- combinators.then(pair_p())
+  use <- parser.drop(chars.string(" v="))
+  use v <- combinators.map(pair_p())
+  #(p, v)
 }
 
 fn robots_p() -> Parser(List(Robot)) {

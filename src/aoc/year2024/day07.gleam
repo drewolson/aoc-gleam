@@ -9,9 +9,12 @@ type Op =
   #(Int, List(Int))
 
 fn op_p() -> Parser(Op) {
-  use goal <- combinators.then(parser.int())
+  use goal <- combinators.then(chars.natural())
   use <- parser.drop(chars.string(": "))
-  use l <- combinators.map(combinators.sep_by1(parser.int(), chars.string(" ")))
+  use l <- combinators.map(combinators.sep_by1(
+    chars.natural(),
+    chars.string(" "),
+  ))
 
   #(goal, l)
 }

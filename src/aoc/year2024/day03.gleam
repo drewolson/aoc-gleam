@@ -26,18 +26,18 @@ fn int() -> Parser(Int) {
 }
 
 fn mul_p() -> Parser(Token) {
-  combinators.succeed(fn(a) { fn(b) { Mul(a:, b:) } })
-  |> parser.skip(chars.string("mul("))
-  |> parser.keep(int())
-  |> parser.skip(chars.string(","))
-  |> parser.keep(int())
-  |> parser.skip(chars.string(")"))
+  use <- parser.drop(chars.string("mul("))
+  use a <- combinators.then(int())
+  use <- parser.drop(chars.string(","))
+  use b <- combinators.then(int())
+  use <- parser.drop(chars.string(")"))
+  combinators.succeed(Mul(a:, b:))
 }
 
 fn token_p() -> Parser(Token) {
   combinators.choice([
-    chars.string("don't()") |> parser.replace(Dont),
-    chars.string("do()") |> parser.replace(Do),
+    chars.string("don't()") |> combinators.replace(Dont),
+    chars.string("do()") |> combinators.replace(Do),
     mul_p(),
     combinators.lazy(fn() {
       combinators.skip_then(combinators.any(), token_p())

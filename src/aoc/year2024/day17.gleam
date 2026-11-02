@@ -15,7 +15,7 @@ type Vm {
 
 fn reg_p(name: String) -> Parser(Int) {
   use <- parser.drop(chars.string("Register " <> name <> ": "))
-  use v <- combinators.then(parser.int())
+  use v <- combinators.then(chars.natural())
   use <- parser.drop(chars.string("\n"))
   combinators.succeed(v)
 }
@@ -26,7 +26,7 @@ fn vm_p() -> Parser(Vm) {
   use c <- combinators.then(reg_p("C"))
   use <- parser.drop(chars.string("\nProgram: "))
   use ops <- combinators.map(combinators.sep_by1(
-    parser.int(),
+    chars.natural(),
     chars.string(","),
   ))
   let prog = ops |> list.index_map(fn(o, i) { #(i, o) }) |> dict.from_list
