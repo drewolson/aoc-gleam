@@ -6,25 +6,29 @@ import gleam/list
 import gleam/result
 import gleam/string
 import gleam/yielder.{type Yielder, Next}
-import party
+import pears/chars
+import pears/combinators
 
 type Vm {
   Vm(a: Int, b: Int, c: Int, pos: Int, prog: Dict(Int, Int))
 }
 
 fn reg_p(name: String) -> Parser(Int) {
-  use <- party.drop(party.string("Register " <> name <> ": "))
-  use v <- party.do(parser.int())
-  use <- party.drop(party.string("\n"))
-  party.return(v)
+  use <- parser.drop(chars.string("Register " <> name <> ": "))
+  use v <- combinators.then(parser.int())
+  use <- parser.drop(chars.string("\n"))
+  combinators.succeed(v)
 }
 
 fn vm_p() -> Parser(Vm) {
-  use a <- party.do(reg_p("A"))
-  use b <- party.do(reg_p("B"))
-  use c <- party.do(reg_p("C"))
-  use <- party.drop(party.string("\nProgram: "))
-  use ops <- party.map(party.sep1(parser.int(), party.string(",")))
+  use a <- combinators.then(reg_p("A"))
+  use b <- combinators.then(reg_p("B"))
+  use c <- combinators.then(reg_p("C"))
+  use <- parser.drop(chars.string("\nProgram: "))
+  use ops <- combinators.map(combinators.sep_by1(
+    parser.int(),
+    chars.string(","),
+  ))
   let prog = ops |> list.index_map(fn(o, i) { #(i, o) }) |> dict.from_list
   Vm(a:, b:, c:, pos: 0, prog:)
 }

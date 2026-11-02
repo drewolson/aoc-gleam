@@ -8,7 +8,8 @@ import gleam/result
 import gleam/set.{type Set}
 import gleam/yielder.{type Yielder}
 import gleamy/priority_queue.{type Queue} as pq
-import party
+import pears/chars
+import pears/combinators
 
 type Coord =
   #(Int, Int)
@@ -38,15 +39,15 @@ fn make_grid(size: Int, bytes: List(Coord)) -> Grid {
 }
 
 fn coord_p() -> Parser(Coord) {
-  use a <- party.do(parser.int())
-  use <- party.drop(party.string(","))
-  use b <- party.map(parser.int())
+  use a <- combinators.then(parser.int())
+  use <- parser.drop(chars.string(","))
+  use b <- combinators.map(parser.int())
 
   #(a, b)
 }
 
 fn input_p() -> Parser(List(Coord)) {
-  party.sep1(coord_p(), party.string("\n"))
+  combinators.sep_by1(coord_p(), chars.string("\n"))
 }
 
 fn neighbors(grid: Grid, seen: Set(Coord), coord: Coord) -> List(Coord) {

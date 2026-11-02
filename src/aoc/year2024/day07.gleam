@@ -2,21 +2,22 @@ import aoc/util/parser.{type Parser}
 import gleam/int
 import gleam/list
 import gleam/yielder.{type Yielder}
-import party
+import pears/chars
+import pears/combinators
 
 type Op =
   #(Int, List(Int))
 
 fn op_p() -> Parser(Op) {
-  use goal <- party.do(parser.int())
-  use <- party.drop(party.string(": "))
-  use l <- party.map(party.sep1(parser.int(), party.string(" ")))
+  use goal <- combinators.then(parser.int())
+  use <- parser.drop(chars.string(": "))
+  use l <- combinators.map(combinators.sep_by1(parser.int(), chars.string(" ")))
 
   #(goal, l)
 }
 
 fn ops_p() -> Parser(List(Op)) {
-  party.sep1(op_p(), party.string("\n"))
+  combinators.sep_by1(op_p(), chars.string("\n"))
 }
 
 fn add(a: Int, b: Int) -> Int {

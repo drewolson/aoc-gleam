@@ -3,7 +3,8 @@ import gleam/int
 import gleam/list
 import gleam/result
 import gleam/string
-import party
+import pears/chars
+import pears/combinators
 
 type Token {
   Mul(a: Int, b: Int)
@@ -12,34 +13,40 @@ type Token {
 }
 
 fn int() -> Parser(Int) {
-  use digits <- party.try(party.digits())
+  use digits <- combinators.try_map(combinators.many1(chars.digit()))
 
-  case string.length(digits) > 3 {
+  case list.length(digits) > 3 {
     True -> Error("int too long")
-    False -> digits |> int.parse |> result.replace_error("not an int")
+    False ->
+      digits
+      |> string.concat
+      |> int.parse
+      |> result.replace_error("not an int")
   }
 }
 
 fn mul_p() -> Parser(Token) {
-  party.return(fn(a) { fn(b) { Mul(a:, b:) } })
-  |> parser.skip(party.string("mul("))
+  combinators.succeed(fn(a) { fn(b) { Mul(a:, b:) } })
+  |> parser.skip(chars.string("mul("))
   |> parser.keep(int())
-  |> parser.skip(party.string(","))
+  |> parser.skip(chars.string(","))
   |> parser.keep(int())
-  |> parser.skip(party.string(")"))
+  |> parser.skip(chars.string(")"))
 }
 
 fn token_p() -> Parser(Token) {
-  party.choice([
-    party.string("don't()") |> parser.replace(Dont),
-    party.string("do()") |> parser.replace(Do),
+  combinators.choice([
+    chars.string("don't()") |> parser.replace(Dont),
+    chars.string("do()") |> parser.replace(Do),
     mul_p(),
-    party.lazy(fn() { party.seq(party.any_char(), token_p()) }),
+    combinators.lazy(fn() {
+      combinators.skip_then(combinators.any(), token_p())
+    }),
   ])
 }
 
 fn tokens_p() -> Parser(List(Token)) {
-  party.many1(token_p())
+  combinators.many1(token_p())
 }
 
 pub fn part1(input: String) -> Int {

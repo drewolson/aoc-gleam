@@ -2,7 +2,8 @@ import aoc/util/li
 import aoc/util/parser.{type Parser}
 import gleam/int
 import gleam/list
-import party
+import pears/chars
+import pears/combinators
 
 type Color {
   Red
@@ -22,36 +23,39 @@ type Game {
 }
 
 fn color_p() -> Parser(Color) {
-  party.choice([
-    party.string("red") |> parser.replace(Red),
-    party.string("blue") |> parser.replace(Blue),
-    party.string("green") |> parser.replace(Green),
+  combinators.choice([
+    chars.string("red") |> parser.replace(Red),
+    chars.string("blue") |> parser.replace(Blue),
+    chars.string("green") |> parser.replace(Green),
   ])
 }
 
 fn draw_p() -> Parser(Draw) {
-  use n <- party.do(parser.int())
-  use <- party.drop(party.whitespace1())
-  use color <- party.do(color_p())
+  use n <- combinators.then(parser.int())
+  use <- parser.drop(chars.whitespace1())
+  use color <- combinators.then(color_p())
 
-  party.return(Draw(n, color))
+  combinators.succeed(Draw(n, color))
 }
 
 fn round_p() -> Parser(Round) {
-  party.sep1(draw_p(), party.string(", "))
+  combinators.sep_by1(draw_p(), chars.string(", "))
 }
 
 fn game_p() -> Parser(Game) {
-  use <- party.drop(party.string("Game "))
-  use n <- party.do(parser.int())
-  use <- party.drop(party.string(": "))
-  use rounds <- party.do(party.sep1(round_p(), party.string("; ")))
+  use <- parser.drop(chars.string("Game "))
+  use n <- combinators.then(parser.int())
+  use <- parser.drop(chars.string(": "))
+  use rounds <- combinators.then(combinators.sep_by1(
+    round_p(),
+    chars.string("; "),
+  ))
 
-  party.return(Game(n, rounds))
+  combinators.succeed(Game(n, rounds))
 }
 
 fn games_p() -> Parser(List(Game)) {
-  party.sep1(game_p(), party.string("\n"))
+  combinators.sep_by1(game_p(), chars.string("\n"))
 }
 
 fn round_count(round: Round) -> #(Int, Int, Int) {

@@ -1,7 +1,8 @@
 import aoc/util/li
 import aoc/util/parser.{type Parser}
 import gleam/list
-import party
+import pears/chars
+import pears/combinators
 
 type Coord =
   #(Int, Int)
@@ -10,10 +11,10 @@ type Config =
   #(Coord, Coord, Coord)
 
 fn coord_p(sep: String) -> Parser(Coord) {
-  party.return(fn(a) { fn(b) { #(a, b) } })
-  |> parser.skip(party.string("X" <> sep))
+  combinators.succeed(fn(a) { fn(b) { #(a, b) } })
+  |> parser.skip(chars.string("X" <> sep))
   |> parser.keep(parser.int())
-  |> parser.skip(party.string(", Y" <> sep))
+  |> parser.skip(chars.string(", Y" <> sep))
   |> parser.keep(parser.int())
 }
 
@@ -26,17 +27,17 @@ fn prize_p() -> Parser(Coord) {
 }
 
 fn config_p() -> Parser(Config) {
-  party.return(fn(a) { fn(b) { fn(c) { #(a, b, c) } } })
-  |> parser.skip(party.string("Button A: "))
+  combinators.succeed(fn(a) { fn(b) { fn(c) { #(a, b, c) } } })
+  |> parser.skip(chars.string("Button A: "))
   |> parser.keep(button_p())
-  |> parser.skip(party.string("\nButton B: "))
+  |> parser.skip(chars.string("\nButton B: "))
   |> parser.keep(button_p())
-  |> parser.skip(party.string("\nPrize: "))
+  |> parser.skip(chars.string("\nPrize: "))
   |> parser.keep(prize_p())
 }
 
 fn configs_p() -> Parser(List(Config)) {
-  party.sep1(config_p(), party.string("\n\n"))
+  combinators.sep_by1(config_p(), chars.string("\n\n"))
 }
 
 fn token_count(config: Config) -> Result(Int, Nil) {

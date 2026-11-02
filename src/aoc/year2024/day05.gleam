@@ -5,7 +5,8 @@ import gleam/list
 import gleam/option.{None, Some}
 import gleam/result
 import gleam/set.{type Set}
-import party
+import pears/chars
+import pears/combinators
 
 type Rule =
   #(Int, Int)
@@ -17,28 +18,28 @@ type Reqs =
   Dict(Int, Set(Int))
 
 fn rule_p() -> Parser(Rule) {
-  use a <- party.do(parser.int())
-  use <- party.drop(party.string("|"))
-  use b <- party.map(parser.int())
+  use a <- combinators.then(parser.int())
+  use <- parser.drop(chars.string("|"))
+  use b <- combinators.map(parser.int())
   #(a, b)
 }
 
 fn rules_p() -> Parser(List(Rule)) {
-  party.sep1(rule_p(), party.string("\n"))
+  combinators.sep_by1(rule_p(), chars.string("\n"))
 }
 
 fn update_p() -> Parser(Update) {
-  party.sep1(parser.int(), party.string(","))
+  combinators.sep_by1(parser.int(), chars.string(","))
 }
 
 fn updates_p() -> Parser(List(Update)) {
-  party.sep1(update_p(), party.string("\n"))
+  combinators.sep_by1(update_p(), chars.string("\n"))
 }
 
 fn input_p() -> Parser(#(List(Rule), List(Update))) {
-  use rules <- party.do(rules_p())
-  use <- party.drop(party.string("\n\n"))
-  use updates <- party.map(updates_p())
+  use rules <- combinators.then(rules_p())
+  use <- parser.drop(chars.string("\n\n"))
+  use updates <- combinators.map(updates_p())
   #(rules, updates)
 }
 

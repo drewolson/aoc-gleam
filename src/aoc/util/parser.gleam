@@ -1,54 +1,46 @@
-import gleam/int
-import gleam/result
-import party
+import pears
+import pears/chars
+import pears/combinators
 
 pub type Parser(a) =
-  party.Parser(a, String)
+  pears.Parser(String, a)
 
-pub fn replace(p: party.Parser(a, e), b: b) -> party.Parser(b, e) {
-  party.map(p, fn(_) { b })
+pub fn replace(p: Parser(a), b: b) -> Parser(b) {
+  combinators.replace(p, b)
 }
 
-pub fn keep(
-  pf: party.Parser(fn(a) -> b, e),
-  pa: party.Parser(a, e),
-) -> party.Parser(b, e) {
-  use f <- party.do(pf)
-  use a <- party.do(pa)
-  party.return(f(a))
+pub fn drop(p: Parser(a), f: fn() -> Parser(b)) -> Parser(b) {
+  combinators.skip_then(p, combinators.lazy(f))
 }
 
-pub fn skip(
-  pa: party.Parser(a, e),
-  pb: party.Parser(b, e),
-) -> party.Parser(a, e) {
-  use a <- party.do(pa)
-  use _ <- party.do(pb)
-  party.return(a)
+pub fn keep(pf: Parser(fn(a) -> b), pa: Parser(a)) -> Parser(b) {
+  use f <- combinators.then(pf)
+  use a <- combinators.then(pa)
+  combinators.succeed(f(a))
 }
 
-pub fn int() -> party.Parser(Int, String) {
-  use digits <- party.try(party.digits())
-
-  digits
-  |> int.parse
-  |> result.replace_error("Not a valid integer")
+pub fn skip(pa: Parser(a), pb: Parser(b)) -> Parser(a) {
+  combinators.then_skip(pa, pb)
 }
 
-pub fn signed_int() -> party.Parser(Int, String) {
-  use mult <- party.do(
-    party.choice([
-      party.string("+") |> replace(1),
-      party.string("-") |> replace(-1),
-      party.return(1),
+pub fn int() -> Parser(Int) {
+  chars.natural()
+}
+
+pub fn signed_int() -> Parser(Int) {
+  use mult <- combinators.then(
+    combinators.choice([
+      chars.string("+") |> replace(1),
+      chars.string("-") |> replace(-1),
+      combinators.succeed(1),
     ]),
   )
-  use i <- party.do(int())
+  use i <- combinators.then(int())
 
-  party.return(mult * i)
+  combinators.succeed(mult * i)
 }
 
 pub fn go(str: String, p: Parser(a)) -> a {
-  let assert Ok(v) = party.go(p, str)
-  v
+  let assert Ok(parsed) = pears.parse_string(str, p)
+  parsed.value
 }

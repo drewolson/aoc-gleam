@@ -7,7 +7,8 @@ import gleam/result
 import gleam/set.{type Set}
 import gleam/string
 import gleam/yielder.{type Yielder, Next}
-import party
+import pears/chars
+import pears/combinators
 
 type Pair =
   #(Int, Int)
@@ -16,22 +17,22 @@ type Robot =
   #(Pair, Pair)
 
 fn pair_p() -> Parser(#(Int, Int)) {
-  use a <- party.do(parser.signed_int())
-  use <- party.drop(party.string(","))
-  use b <- party.map(parser.signed_int())
+  use a <- combinators.then(parser.signed_int())
+  use <- parser.drop(chars.string(","))
+  use b <- combinators.map(parser.signed_int())
   #(a, b)
 }
 
 fn robot_p() -> Parser(Robot) {
-  party.return(fn(p) { fn(v) { #(p, v) } })
-  |> parser.skip(party.string("p="))
+  combinators.succeed(fn(p) { fn(v) { #(p, v) } })
+  |> parser.skip(chars.string("p="))
   |> parser.keep(pair_p())
-  |> parser.skip(party.string(" v="))
+  |> parser.skip(chars.string(" v="))
   |> parser.keep(pair_p())
 }
 
 fn robots_p() -> Parser(List(Robot)) {
-  party.sep1(robot_p(), party.string("\n"))
+  combinators.sep_by1(robot_p(), chars.string("\n"))
 }
 
 fn mod(a: Int, b: Int) -> Int {
