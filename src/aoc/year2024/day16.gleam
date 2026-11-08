@@ -1,12 +1,10 @@
+import aoc/util/pq.{type Queue}
 import aoc/util/str
 import gleam/dict.{type Dict}
-import gleam/int
 import gleam/list
-import gleam/order.{type Order}
 import gleam/result
 import gleam/set.{type Set}
 import gleam/string
-import gleamy/priority_queue.{type Queue} as pq
 
 type Coord =
   #(Int, Int)
@@ -46,10 +44,8 @@ fn find_coord(grid: Grid, val: String) -> Coord {
   coord
 }
 
-fn order(a: Node, b: Node) -> Order {
-  let #(a_score, _, _, _) = a
-  let #(b_score, _, _, _) = b
-  int.compare(a_score, b_score)
+fn push(q: Queue(Node), node: Node) -> Queue(Node) {
+  pq.push(q, node.0, node)
 }
 
 fn neighbors(
@@ -100,7 +96,7 @@ fn merge_nodes_aux(
   path: Set(Coord),
 ) -> #(Queue(Node), Node) {
   case pq.pop(q) {
-    Ok(#(#(s, coord, d, p) as node, q)) if s == score -> {
+    Ok(#(_, #(s, coord, d, p) as node, q)) if s == score -> {
       case coord == goal && d == dir {
         False -> merge_nodes_aux(q, goal, dir, score, [node, ..nonmatch], path)
         True ->
@@ -108,7 +104,7 @@ fn merge_nodes_aux(
       }
     }
     _ -> {
-      let q = list.fold(nonmatch, q, pq.push)
+      let q = list.fold(nonmatch, q, push)
       let node = #(score, goal, dir, path)
       #(q, node)
     }
@@ -132,11 +128,11 @@ fn search(
 ) -> #(Int, Set(Coord)) {
   case pq.pop(q) {
     Error(_) -> #(0, set.new())
-    Ok(#(#(score, coord, dir, _), _)) if coord == goal -> {
+    Ok(#(_, #(score, coord, dir, _), _)) if coord == goal -> {
       let #(_, node) = merge_nodes(q, coord, dir, score)
       #(score, node.3)
     }
-    Ok(#(#(score, coord, dir, _), nq)) -> {
+    Ok(#(_, #(score, coord, dir, _), nq)) -> {
       case set.contains(seen, #(coord, dir)) {
         True -> search(nq, seen, grid, goal)
         False -> {
@@ -147,7 +143,7 @@ fn search(
           |> list.map(fn(node) {
             #(node.0 + score, node.1, node.2, set.insert(path, node.1))
           })
-          |> list.fold(q, pq.push)
+          |> list.fold(q, push)
           |> search(seen, grid, goal)
         }
       }
@@ -159,7 +155,7 @@ pub fn solve(input: String) -> #(Int, Set(Coord)) {
   let grid = make_grid(input)
   let start = find_coord(grid, "S")
   let goal = find_coord(grid, "E")
-  let q = pq.from_list([#(0, start, East, set.from_list([start]))], order)
+  let q = pq.new() |> push(#(0, start, East, set.from_list([start])))
   search(q, set.new(), grid, goal)
 }
 
